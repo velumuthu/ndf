@@ -2,25 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingCart, ChevronDown } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useCart } from './cart-provider';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import React from 'react';
-import { products } from '@/lib/mock-data';
 import { MobileNav } from './mobile-nav';
 
 const navLinks = [
   { href: '/', label: 'Home' },
+  { href: '/shop', label: 'Shop' },
   { href: '/bulk-order', label: 'Bulk Orders' },
 ];
-
-const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
 
 export function Header() {
   const { cart } = useCart();
@@ -46,21 +38,6 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-           <DropdownMenu>
-            <DropdownMenuTrigger className={cn(
-                'flex items-center text-base font-medium transition-colors hover:text-primary',
-                pathname.startsWith('/shop') ? 'text-primary' : 'text-muted-foreground'
-              )}>
-              Shop <ChevronDown className="ml-1 h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {categories.map((category) => (
-                 <DropdownMenuItem key={category} asChild>
-                    <Link href="/shop">{category}</Link>
-                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </nav>
         <div className="flex items-center space-x-4">
           <Link href="/cart" className="relative group">
@@ -72,7 +49,7 @@ export function Header() {
             )}
           </Link>
           <div className="md:hidden">
-            <MobileNav navLinks={navLinks} categories={categories} />
+            <MobileNav navLinks={navLinks} />
           </div>
         </div>
       </div>

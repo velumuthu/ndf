@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from './ui/sheet';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { cn } from '@/lib/utils';
 
 interface NavLink {
@@ -16,10 +15,9 @@ interface NavLink {
 
 interface MobileNavProps {
     navLinks: NavLink[];
-    categories: string[];
 }
 
-export function MobileNav({ navLinks, categories }: MobileNavProps) {
+export function MobileNav({ navLinks }: MobileNavProps) {
     const [isClient, setIsClient] = useState(false);
     const pathname = usePathname();
 
@@ -58,25 +56,6 @@ export function MobileNav({ navLinks, categories }: MobileNavProps) {
                             {link.label}
                         </Link>
                     ))}
-                    <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="shop" className="border-b-0">
-                            <AccordionTrigger className={cn(
-                                'text-xl font-medium transition-colors hover:text-primary hover:no-underline py-3',
-                                pathname.startsWith('/shop') ? 'text-primary' : 'text-muted-foreground'
-                            )}>
-                                Shop
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="flex flex-col space-y-3 pl-4">
-                                    {categories.map((category) => (
-                                        <Link key={category} href="/shop" className="text-lg text-muted-foreground hover:text-primary">
-                                            {category}
-                                        </Link>
-                                    ))}
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
                 </div>
             </SheetContent>
         </Sheet>
