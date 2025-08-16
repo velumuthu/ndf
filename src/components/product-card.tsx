@@ -16,9 +16,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
 
   return (
-    <Card className="flex flex-col overflow-hidden h-full group transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-background">
+    <Card className="flex flex-col overflow-hidden h-full group transition-all duration-300 border-0 bg-transparent shadow-none rounded-none">
       <CardHeader className="p-0">
-        <Link href="#" className="block overflow-hidden">
+        <Link href="#" className="block overflow-hidden rounded-lg">
           <Image
             src={product.image}
             alt={product.name}
@@ -30,19 +30,20 @@ export function ProductCard({ product }: ProductCardProps) {
         </Link>
       </CardHeader>
       <CardContent className="p-4 flex-grow">
-        <CardTitle className="text-lg font-medium leading-snug">
+        <CardTitle className="text-lg font-semibold leading-snug">
           <Link href="#" className="hover:text-primary transition-colors">
             {product.name}
           </Link>
         </CardTitle>
-        <p className="text-xl font-semibold text-primary-foreground/90 mt-2">
+        <p className="text-lg font-bold text-foreground mt-2">
           ${product.price.toFixed(2)}
         </p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Button
           onClick={() => addToCart(product)}
-          className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+          variant="secondary"
+          className="w-full font-bold"
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           Add to Cart
