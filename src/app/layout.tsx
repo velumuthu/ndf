@@ -6,7 +6,7 @@ import { Footer } from '@/components/footer';
 import { CartProvider } from '@/components/cart-provider';
 
 export const metadata: Metadata = {
-  title: 'Atelier Lumière',
+  title: 'Namma Dream Fashion',
   description: 'An elegant e-commerce website for a fashion boutique.',
 };
 

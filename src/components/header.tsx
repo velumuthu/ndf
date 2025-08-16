@@ -24,7 +24,7 @@ export function Header() {
     <header className="bg-background/80 backdrop-blur-md sticky top-0 z-40 border-b">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="text-2xl font-headline text-gray-800 hover:text-primary transition-colors">
-          Atelier Lumière
+          Namma Dream Fashion
         </Link>
         <nav className="hidden md:flex items-center space-x-6">
           {navLinks.map((link) => (

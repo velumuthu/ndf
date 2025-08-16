@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="bg-background border-t">
       <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <p className="text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Atelier Lumière. All rights reserved.
+          &copy; {new Date().getFullYear()} Namma Dream Fashion. All rights reserved.
         </p>
       </div>
     </footer>
