@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -18,6 +19,7 @@ interface MobileNavProps {
 }
 
 export function MobileNav({ navLinks }: MobileNavProps) {
+    const [open, setOpen] = useState(false);
     const [isClient, setIsClient] = useState(false);
     const pathname = usePathname();
 
@@ -34,7 +36,7 @@ export function MobileNav({ navLinks }: MobileNavProps) {
     }
     
     return (
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                     <Menu className="h-6 w-6" />
@@ -48,6 +50,7 @@ export function MobileNav({ navLinks }: MobileNavProps) {
                         <Link
                             key={link.href}
                             href={link.href}
+                            onClick={() => setOpen(false)}
                             className={cn(
                                 'text-xl font-medium transition-colors hover:text-primary py-3',
                                 pathname === link.href ? 'text-primary' : 'text-muted-foreground'
