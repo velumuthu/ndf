@@ -32,8 +32,8 @@ export function Header() {
   return (
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-40 border-b">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-2xl font-headline font-bold text-foreground hover:text-primary transition-colors">
-          NDF
+        <Link href="/" className="text-xl font-headline font-bold text-foreground hover:text-primary transition-colors">
+          Namma Dream Fashion
         </Link>
         <nav className="hidden md:flex items-center space-x-8">
           {navLinks.map((link) => (
