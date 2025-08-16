@@ -1,0 +1,63 @@
+'use client';
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import React from "react";
+
+export default function BulkOrderPage() {
+  const { toast } = useToast();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toast({
+      title: "Inquiry Submitted!",
+      description: "Thank you for your interest. We will get back to you within 2-3 business days.",
+    });
+    (e.target as HTMLFormElement).reset();
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl md:text-4xl font-headline">Bulk Order Inquiry</CardTitle>
+          <CardDescription className="text-lg">
+            Interested in placing a large order for your business or event? Fill out the form below.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input id="name" placeholder="Jane Doe" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="company">Company Name (Optional)</Label>
+                <Input id="company" placeholder="Fashion Corp" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input id="email" type="email" placeholder="jane.doe@example.com" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="message">Inquiry Details</Label>
+              <Textarea
+                id="message"
+                placeholder="Please tell us about the products and quantities you are interested in."
+                className="min-h-[150px]"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" size="lg">Submit Inquiry</Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
