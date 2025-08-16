@@ -9,12 +9,27 @@ import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
+import React from 'react';
+import { db } from '@/lib/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
+  const [shippingInfo, setShippingInfo] = React.useState({
+    name: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+  });
 
-  const handlePlaceOrder = () => {
+  const handleShippingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setShippingInfo(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePlaceOrder = async () => {
     if (cart.length === 0) {
       toast({
         title: "Your cart is empty",
@@ -23,11 +38,37 @@ export default function CartPage() {
       });
       return;
     }
-    toast({
-      title: 'Order Placed!',
-      description: 'Thank you for your purchase. A confirmation has been sent to your email.',
-    });
-    clearCart();
+    
+    if (Object.values(shippingInfo).some(val => val.trim() === '')) {
+      toast({
+        title: 'Missing Shipping Information',
+        description: 'Please fill out all shipping fields.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'orders'), {
+        cart,
+        totalPrice,
+        shippingInfo,
+        createdAt: serverTimestamp(),
+      });
+      toast({
+        title: 'Order Placed!',
+        description: 'Thank you for your purchase. A confirmation has been sent to your email.',
+      });
+      clearCart();
+      setShippingInfo({ name: '', address: '', city: '', state: '', zip: '' });
+    } catch (error) {
+      console.error("Error placing order: ", error);
+      toast({
+        title: 'Error',
+        description: 'There was an error placing your order. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
   
   return (
@@ -98,12 +139,12 @@ export default function CartPage() {
              <Separator />
              <div className="space-y-2">
                 <h3 className="font-semibold">Shipping Information</h3>
-                <Input placeholder="Full Name" />
-                <Input placeholder="Address" />
-                <Input placeholder="City" />
+                <Input name="name" placeholder="Full Name" value={shippingInfo.name} onChange={handleShippingInfoChange} />
+                <Input name="address" placeholder="Address" value={shippingInfo.address} onChange={handleShippingInfoChange} />
+                <Input name="city" placeholder="City" value={shippingInfo.city} onChange={handleShippingInfoChange} />
                 <div className="flex gap-2">
-                    <Input placeholder="State" />
-                    <Input placeholder="ZIP Code" />
+                    <Input name="state" placeholder="State" value={shippingInfo.state} onChange={handleShippingInfoChange} />
+                    <Input name="zip" placeholder="ZIP Code" value={shippingInfo.zip} onChange={handleShippingInfoChange} />
                 </div>
              </div>
           </CardContent>

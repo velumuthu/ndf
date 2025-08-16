@@ -7,17 +7,36 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
+import { db } from '@/lib/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 export default function BulkOrderPage() {
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast({
-      title: "Inquiry Submitted!",
-      description: "Thank you for your interest. We will get back to you within 2-3 business days.",
-    });
-    (e.target as HTMLFormElement).reset();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      await addDoc(collection(db, 'bulk-orders'), {
+        ...data,
+        createdAt: serverTimestamp(),
+      });
+      toast({
+        title: "Inquiry Submitted!",
+        description: "Thank you for your interest. We will get back to you within 2-3 business days.",
+      });
+      form.reset();
+    } catch (error) {
+       console.error("Error submitting inquiry: ", error);
+       toast({
+        title: "Error",
+        description: "There was an error submitting your inquiry. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -34,21 +53,22 @@ export default function BulkOrderPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
-                <Input id="name" placeholder="Jane Doe" required />
+                <Input id="name" name="name" placeholder="Jane Doe" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="company">Company Name (Optional)</Label>
-                <Input id="company" placeholder="Fashion Corp" />
+                <Input id="company" name="company" placeholder="Fashion Corp" />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
-              <Input id="email" type="email" placeholder="jane.doe@example.com" required />
+              <Input id="email" name="email" type="email" placeholder="jane.doe@example.com" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="message">Inquiry Details</Label>
               <Textarea
                 id="message"
+                name="message"
                 placeholder="Please tell us about the products and quantities you are interested in."
                 className="min-h-[150px]"
                 required
