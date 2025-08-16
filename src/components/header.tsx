@@ -5,8 +5,9 @@ import { usePathname } from 'next/navigation';
 import { ShoppingCart, Menu } from 'lucide-react';
 import { useCart } from './cart-provider';
 import { Button } from './ui/button';
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from './ui/sheet';
 import { cn } from '@/lib/utils';
+import React from 'react';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -56,6 +57,8 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right">
+                <SheetTitle className="sr-only">Mobile Navigation Menu</SheetTitle>
+                <SheetDescription className="sr-only">A list of links to navigate the site.</SheetDescription>
                 <div className="flex flex-col space-y-6 pt-10">
                   {navLinks.map((link) => (
                     <Link
