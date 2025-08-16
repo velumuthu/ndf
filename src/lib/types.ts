@@ -3,7 +3,7 @@ export type Product = {
   name: string;
   price: number;
   image: string;
-  category: 'Dresses' | 'Accessories' | 'Combos';
+  category: 'Dresses' | 'Accessories' | 'Combos' | 'Shirts' | 'Pants' | 'Sportswear' | 'Formals' | 'Casuals';
   trending: boolean;
   description: string;
   dataAiHint: string;
