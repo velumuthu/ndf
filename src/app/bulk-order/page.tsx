@@ -60,9 +60,25 @@ export default function BulkOrderPage() {
                 <Input id="company" name="company" placeholder="Fashion Corp" />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input id="email" name="email" type="email" placeholder="jane.doe@example.com" required />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" name="email" type="email" placeholder="jane.doe@example.com" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input id="phone" name="phone" type="tel" placeholder="(123) 456-7890" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               <div className="space-y-2">
+                <Label htmlFor="quantity">Estimated Quantity</Label>
+                <Input id="quantity" name="quantity" type="number" placeholder="100" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="delivery-date">Desired Delivery Date</Label>
+                <Input id="delivery-date" name="deliveryDate" type="date" />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="message">Inquiry Details</Label>
