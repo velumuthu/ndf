@@ -1,11 +1,41 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
-import { products } from "@/lib/mock-data";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import type { Product } from "@/lib/types";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
-  const trendingProducts = products.filter(p => p.trending).slice(0, 4);
+  const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTrendingProducts = async () => {
+      try {
+        const productsCollection = collection(db, "products");
+        const q = query(productsCollection, where("trending", "==", true));
+        const querySnapshot = await getDocs(q);
+        const products: Product[] = [];
+        querySnapshot.forEach((doc) => {
+          products.push({ id: doc.id, ...doc.data() } as Product);
+        });
+        setTrendingProducts(products);
+      } catch (error) {
+        console.error("Error fetching trending products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTrendingProducts();
+  }, []);
+
 
   return (
     <div className="space-y-24 md:space-y-32">
@@ -28,11 +58,38 @@ export default function Home() {
              <Link href="/shop">Shop All <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {trendingProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <Skeleton className="h-[450px] w-full" />
+                <Skeleton className="h-[450px] w-full" />
+                <Skeleton className="h-[450px] w-full" />
+                <Skeleton className="h-[450px] w-full" />
+            </div>
+        ) : (
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            plugins={[
+              Autoplay({
+                delay: 3000,
+                stopOnInteraction: false,
+              }),
+            ]}
+            className="w-full"
+          >
+            <CarouselContent>
+              {trendingProducts.map((product) => (
+                <CarouselItem key={product.id} className="sm:basis-1/2 lg:basis-1/4">
+                  <ProductCard product={product} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        )}
       </section>
       
       <section className="text-center">

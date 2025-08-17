@@ -13,3 +13,17 @@ export type CartItem = {
   product: Product;
   quantity: number;
 };
+
+export type Order = {
+  id?: string;
+  cart: CartItem[];
+  totalPrice: number;
+  shippingInfo: {
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+  };
+  createdAt: any;
+}
