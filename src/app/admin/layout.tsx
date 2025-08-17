@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Package, ShoppingBag, Tag, LayoutDashboard, MessageSquareHeart, ClipboardList, Megaphone } from 'lucide-react';
+import { Package, ShoppingBag, Tag, LayoutDashboard, MessageSquareHeart, ClipboardList, Megaphone, LogOut } from 'lucide-react';
 import { Shield } from 'lucide-react';
+import { useAuth } from '@/components/auth-provider';
+import { useRouter } from 'next/navigation';
 
 const adminNavLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -24,6 +26,18 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { user, loading, logout } = useAuth();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login?redirect=/admin');
+    }
+  }, [user, loading, router]);
+  
+  if (loading || !user) {
+    return <div className="flex justify-center items-center h-screen"><p>Loading...</p></div>
+  }
 
   return (
     <div className="grid md:grid-cols-[240px_1fr] gap-10">
@@ -51,6 +65,13 @@ export default function AdminLayout({
               </Link>
             );
           })}
+           <button
+            onClick={logout}
+            className='flex items-center px-4 py-2 rounded-lg text-base font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'
+          >
+            <LogOut className="mr-3 h-5 w-5" />
+            Logout
+          </button>
         </nav>
       </aside>
       <main>

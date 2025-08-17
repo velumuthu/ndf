@@ -25,9 +25,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useAuth } from '@/components/auth-provider';
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
@@ -45,6 +47,12 @@ export default function CartPage() {
     setFinalPrice(totalPrice * (1 - discount));
   }, [totalPrice, discount]);
   
+  useEffect(() => {
+    if (user) {
+      setShippingInfo(prev => ({ ...prev, name: user.displayName || '', email: user.email || '' }));
+    }
+  }, [user]);
+
   const handleShippingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setShippingInfo(prev => ({ ...prev, [name]: value }));
@@ -101,7 +109,7 @@ export default function CartPage() {
         shippingInfo,
         status: 'Pending',
         createdAt: serverTimestamp(),
-        userId: null, // User is anonymous
+        userId: user ? user.uid : null,
       });
       toast({
         title: 'Order Placed!',

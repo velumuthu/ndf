@@ -1,23 +1,34 @@
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, LogOut, User } from 'lucide-react';
 import { useCart } from './cart-provider';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { MobileNav } from './mobile-nav';
+import { useAuth } from './auth-provider';
+import { Button } from './ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop' },
   { href: '/offers', label: 'Offers' },
   { href: '/bulk-order', label: 'Bulk Orders' },
-  { href: '/admin', label: 'Admin' },
 ];
 
 export function Header() {
   const { cart } = useCart();
+  const { user, loading, logout } = useAuth();
   const pathname = usePathname();
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -34,7 +45,7 @@ export function Header() {
               href={link.href}
               className={cn(
                 'text-base font-medium transition-colors hover:text-primary',
-                pathname === link.href || (link.href === '/admin' && pathname.startsWith('/admin')) ? 'text-primary' : 'text-muted-foreground'
+                pathname === link.href ? 'text-primary' : 'text-muted-foreground'
               )}
             >
               {link.label}
@@ -50,6 +61,42 @@ export function Header() {
               </span>
             )}
           </Link>
+
+           {!loading && (
+              user ? (
+                 <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                       <User className="h-6 w-6 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile">
+                        Profile & Orders
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout}>
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/login">Login</Link>
+                </Button>
+              )
+           )}
 
           <div className="md:hidden">
             <MobileNav navLinks={navLinks} />

@@ -30,6 +30,7 @@ export function Footer() {
         </div>
         <div className="border-t mt-8 pt-6 text-center text-sm text-muted-foreground">
            <p>&copy; {new Date().getFullYear()} Namma Dream Fashion. All rights reserved.</p>
+           <p className="mt-2"><Link href="/admin" className="hover:text-primary">Admin Login</Link></p>
         </div>
       </div>
     </footer>

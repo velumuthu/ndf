@@ -1,4 +1,6 @@
 
+import type { User as FirebaseUser } from 'firebase/auth';
+
 export type Product = {
   id: string;
   name: string;
@@ -32,6 +34,7 @@ export type Order = {
   };
   status: string;
   createdAt: any;
+  userId?: string | null;
 }
 
 export type BulkOrder = {
@@ -69,3 +72,9 @@ export type StylistInquiry = {
     message: string;
     createdAt: any;
 }
+
+export type AuthContextType = {
+  user: FirebaseUser | null;
+  loading: boolean;
+  logout: () => Promise<void>;
+};
