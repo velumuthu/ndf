@@ -1,114 +1,40 @@
 
-'use client';
+import React, { Suspense } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from '@/components/ui/skeleton';
+import { LoginForm } from '@/components/login-form';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { auth, db } from '@/lib/firebase';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
-import { Loader2 } from "lucide-react";
-import { doc, getDoc } from "firebase/firestore";
+function LoginPageSkeleton() {
+    return (
+        <div className="max-w-md mx-auto p-4">
+            <Card>
+                <CardHeader className="text-center">
+                    <CardTitle className="text-3xl font-headline">Login</CardTitle>
+                    <CardDescription>
+                        Access your account and order history.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <Skeleton className="h-12 w-full" />
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+
 
 export default function LoginPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { toast } = useToast();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Check user role
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists() && userDoc.data().role === 'admin') {
-        // If user is an admin, prevent login through this page
-        await auth.signOut();
-        toast({
-          title: "Admin Account",
-          description: "Please use the admin login page to access the dashboard.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      
-      const redirectUrl = searchParams.get('redirect') || '/profile';
-      router.push(redirectUrl);
-      toast({
-        title: "Logged In",
-        description: "Welcome back!",
-      });
-    } catch (error: any) {
-      console.error("Error signing in: ", error);
-      toast({
-        title: "Login Failed",
-        description: "Invalid email or password.",
-        variant: "destructive",
-      });
-    } finally {
-        setLoading(false);
-    }
-  };
-
   return (
-    <div className="max-w-md mx-auto p-4">
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-headline">Login</CardTitle>
-          <CardDescription>
-            Access your account and order history.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input 
-                id="email" 
-                name="email" 
-                type="email" 
-                placeholder="jane.doe@example.com" 
-                required 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                name="password" 
-                type="password" 
-                required 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <Button type="submit" className="w-full" size="lg" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-            <p className="text-sm text-muted-foreground">
-                Don't have an account? <Link href="/signup" className="text-primary hover:underline">Sign up</Link>
-            </p>
-        </CardFooter>
-      </Card>
-    </div>
+    <Suspense fallback={<LoginPageSkeleton />}>
+      <LoginForm />
+    </Suspense>
   );
 }
