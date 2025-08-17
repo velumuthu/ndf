@@ -30,12 +30,7 @@ export default function AdminLoginPage() {
         setError('');
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            // After sign-in, we need to check if the user is an admin.
-            // The useAdmin hook will update, but we might need to wait for it.
-            // A simple check here is good, but the layout is the ultimate guard.
-            // To be sure, we can manually trigger a check or rely on redirection from layout.
-            // For now, let's assume the hook updates fast enough.
-            router.push('/admin/products');
+            router.push('/admin');
             toast({
                 title: "Admin Login Successful",
                 description: "Welcome to the dashboard!",
