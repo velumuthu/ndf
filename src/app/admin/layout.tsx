@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Package, ShoppingBag, Tag, Users, Shield, LayoutDashboard } from 'lucide-react';
+import { Package, ShoppingBag, Tag, Users, Shield, LayoutDashboard, MessageSquareHeart } from 'lucide-react';
 import { useAuth } from '@/components/auth-provider';
 import { useAdmin } from '@/hooks/use-admin';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ const adminNavLinks = [
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/bulk-orders', label: 'Bulk Orders', icon: ShoppingBag },
   { href: '/admin/offers', label: 'Offers', icon: Tag },
+  { href: '/admin/contact-stylist', label: 'Stylist Inquiries', icon: MessageSquareHeart },
 ];
 
 export default function AdminLayout({

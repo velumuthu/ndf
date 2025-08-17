@@ -48,3 +48,12 @@ export type Offer = {
     discountPercentage: number;
     active: boolean;
 }
+
+export type StylistInquiry = {
+    id: string;
+    name: string;
+    email: string;
+    occasion: string;
+    message: string;
+    createdAt: any;
+}
