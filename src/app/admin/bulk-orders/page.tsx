@@ -95,6 +95,7 @@ export default function AdminBulkOrdersPage() {
                 <TableHead>Date</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead>Message</TableHead>
               </TableRow>
@@ -107,6 +108,7 @@ export default function AdminBulkOrdersPage() {
                   </TableCell>
                   <TableCell className="font-medium">{order.name}</TableCell>
                    <TableCell>{order.email}</TableCell>
+                   <TableCell>{order.phone || 'N/A'}</TableCell>
                    <TableCell>{order.quantity}</TableCell>
                   <TableCell className="max-w-xs truncate">{order.message}</TableCell>
                 </TableRow>

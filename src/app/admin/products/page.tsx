@@ -74,7 +74,7 @@ export default function AdminProductsPage() {
       reader.readAsDataURL(file);
     } else {
       setImageFile(null);
-      setImagePreview(null);
+      setImagePreview(editingProduct?.image || null);
     }
   };
 
@@ -141,7 +141,7 @@ export default function AdminProductsPage() {
       e.preventDefault();
       setIsSubmitting(true);
       const formData = new FormData(e.currentTarget);
-      const productData = Object.fromEntries(formData.entries()) as Omit<Product, 'id' | 'trending' | 'image'> & { price: string };
+      const productData = Object.fromEntries(formData.entries()) as Omit<Product, 'id' | 'trending' | 'image' | 'price'> & { price: string };
 
       let imageUrl = editingProduct?.image || '';
 

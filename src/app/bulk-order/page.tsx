@@ -23,7 +23,6 @@ export default function BulkOrderPage() {
       await addDoc(collection(db, 'bulk-orders'), {
         ...data,
         createdAt: serverTimestamp(),
-        userId: null, // User is anonymous
       });
       toast({
         title: "Inquiry Submitted!",
