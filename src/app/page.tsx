@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ export default function Home() {
     <div className="space-y-24 md:space-y-32">
       <section className="text-center min-h-[60vh] flex flex-col items-center justify-center">
         <h1 className="font-headline text-5xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter">
+          <span className="block text-4xl md:text-6xl lg:text-7xl font-medium tracking-normal text-muted-foreground">Namma Dream Fashion</span>
           Style Redefined.
         </h1>
         <p className="mt-6 max-w-xl mx-auto text-lg md:text-xl text-muted-foreground">
