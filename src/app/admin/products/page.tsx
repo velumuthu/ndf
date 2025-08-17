@@ -39,6 +39,8 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageUrlInput, setImageUrlInput] = useState('');
+
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -67,6 +69,7 @@ export default function AdminProductsPage() {
     const file = e.target.files?.[0];
     if (file) {
       setImageFile(file);
+      setImageUrlInput(''); // Clear URL input if file is selected
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -74,9 +77,19 @@ export default function AdminProductsPage() {
       reader.readAsDataURL(file);
     } else {
       setImageFile(null);
-      setImagePreview(editingProduct?.image || null);
+      if (!imageUrlInput) {
+         setImagePreview(editingProduct?.image || null);
+      }
     }
   };
+
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageUrlInput(e.target.value);
+    setImagePreview(e.target.value);
+    if(e.target.value) {
+        setImageFile(null); // Clear file input if URL is entered
+    }
+  }
 
   const handleTrendingToggle = async (productId: string, currentStatus: boolean) => {
     const productRef = doc(db, 'products', productId);
@@ -127,6 +140,7 @@ export default function AdminProductsPage() {
     setEditingProduct(product);
     setImageFile(null);
     setImagePreview(product?.image || null);
+    setImageUrlInput(product?.image || '');
     setIsDialogOpen(true);
   }
 
@@ -135,34 +149,40 @@ export default function AdminProductsPage() {
     setEditingProduct(null);
     setImageFile(null);
     setImagePreview(null);
+    setImageUrlInput('');
   }
 
   const handleProductFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setIsSubmitting(true);
       const formData = new FormData(e.currentTarget);
-      const productData = Object.fromEntries(formData.entries()) as Omit<Product, 'id' | 'trending' | 'image' | 'price'> & { price: string };
+      const productData = Object.fromEntries(formData.entries()) as Omit<Product, 'id' | 'trending' | 'image' | 'price' | 'imageUrl'> & { price: string, imageUrl: string };
 
-      let imageUrl = editingProduct?.image || '';
+      let finalImageUrl = editingProduct?.image || '';
 
       try {
         if (imageFile) {
           const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
           const uploadResult = await uploadBytes(storageRef, imageFile);
-          imageUrl = await getDownloadURL(uploadResult.ref);
+          finalImageUrl = await getDownloadURL(uploadResult.ref);
+        } else if (productData.imageUrl) {
+            finalImageUrl = productData.imageUrl;
         }
 
-        if (!imageUrl) {
-            toast({ title: "Error", description: "An image is required.", variant: "destructive"});
+        if (!finalImageUrl) {
+            toast({ title: "Error", description: "An image file or URL is required.", variant: "destructive"});
             setIsSubmitting(false);
             return;
         }
 
         const dataToSave = {
-            ...productData,
+            name: productData.name,
+            description: productData.description,
             price: parseFloat(productData.price),
+            category: productData.category,
+            dataAiHint: productData.dataAiHint,
             trending: editingProduct ? editingProduct.trending : false,
-            image: imageUrl,
+            image: finalImageUrl,
         };
 
           if (editingProduct) {
@@ -251,6 +271,16 @@ export default function AdminProductsPage() {
                         <Label htmlFor="image" className="text-right pt-2">Image</Label>
                         <div className="col-span-3 space-y-2">
                            <Input id="image" name="image" type="file" accept="image/*" onChange={handleImageChange} />
+                            <div className="text-center text-xs text-muted-foreground">OR</div>
+                            <Input 
+                                id="imageUrl" 
+                                name="imageUrl" 
+                                type="text" 
+                                placeholder="Paste image URL" 
+                                value={imageUrlInput}
+                                onChange={handleImageUrlChange} 
+                                className="col-span-3" 
+                            />
                             {imagePreview && (
                                 <Image
                                 src={imagePreview}
@@ -330,3 +360,6 @@ export default function AdminProductsPage() {
     </div>
   );
 }
+
+
+    
