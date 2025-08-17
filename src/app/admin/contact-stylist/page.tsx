@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -89,30 +90,32 @@ export default function AdminStylistInquiriesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Occasion</TableHead>
-                <TableHead>Message</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {inquiries.map(inquiry => (
-                <TableRow key={inquiry.id}>
-                  <TableCell>
-                    {new Date(inquiry.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="font-medium">{inquiry.name}</TableCell>
-                   <TableCell>{inquiry.email}</TableCell>
-                   <TableCell>{inquiry.occasion}</TableCell>
-                  <TableCell className="max-w-xs truncate">{inquiry.message}</TableCell>
+         <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Occasion</TableHead>
+                  <TableHead>Message</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {inquiries.map(inquiry => (
+                  <TableRow key={inquiry.id}>
+                    <TableCell>
+                      {new Date(inquiry.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="font-medium">{inquiry.name}</TableCell>
+                    <TableCell>{inquiry.email}</TableCell>
+                    <TableCell>{inquiry.occasion}</TableCell>
+                    <TableCell className="max-w-xs truncate">{inquiry.message}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

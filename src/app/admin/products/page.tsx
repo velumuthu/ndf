@@ -37,7 +37,6 @@ export default function AdminProductsPage() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrlInput, setImageUrlInput] = useState('');
 
@@ -65,23 +64,9 @@ export default function AdminProductsPage() {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      setImageUrlInput(''); // Clear URL input if file is selected
-    }
-  }
-
   const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImageUrlInput(e.target.value);
     setImagePreview(e.target.value);
-    setImageFile(null); // Clear file input if URL is entered
   }
 
   const handleTrendingToggle = async (productId: string, currentStatus: boolean) => {
@@ -131,7 +116,6 @@ export default function AdminProductsPage() {
 
   const handleOpenDialog = (product: Product | null = null) => {
     setEditingProduct(product);
-    setImageFile(null);
     setImagePreview(product?.image || null);
     setImageUrlInput(product?.image || '');
     setIsDialogOpen(true);
@@ -140,7 +124,6 @@ export default function AdminProductsPage() {
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setEditingProduct(null);
-    setImageFile(null);
     setImagePreview(null);
     setImageUrlInput('');
   }
@@ -154,16 +137,12 @@ export default function AdminProductsPage() {
       let finalImageUrl = editingProduct?.image || '';
 
       try {
-        if (imageFile) {
-          const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
-          const uploadResult = await uploadBytes(storageRef, imageFile);
-          finalImageUrl = await getDownloadURL(uploadResult.ref);
-        } else if (imageUrlInput) {
+        if (imageUrlInput) {
             finalImageUrl = imageUrlInput;
         }
 
         if (!finalImageUrl) {
-            toast({ title: "Error", description: "An image is required. Please upload a file or provide a URL.", variant: "destructive"});
+            toast({ title: "Error", description: "An image URL is required.", variant: "destructive"});
             setIsSubmitting(false);
             return;
         }
@@ -231,89 +210,82 @@ export default function AdminProductsPage() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="sm:max-w-[525px]">
+            <DialogContent className="sm:max-w-[525px] grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
                 <DialogHeader>
                     <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
                     <DialogDescription>
                         {editingProduct ? 'Update the details of the existing product.' : 'Fill in the details for the new product.'}
                     </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleProductFormSubmit} className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">Name</Label>
-                        <Input id="name" name="name" defaultValue={editingProduct?.name} className="col-span-3" required />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="description" className="text-right">Description</Label>
-                        <Textarea id="description" name="description" defaultValue={editingProduct?.description} className="col-span-3 min-h-[100px] md:min-h-[100px]" required />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="price" className="text-right">Price</Label>
-                        <Input id="price" name="price" type="number" step="0.01" defaultValue={editingProduct?.price} className="col-span-3" required/>
-                    </div>
-                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="stock" className="text-right">Stock</Label>
-                        <Input id="stock" name="stock" type="number" step="1" defaultValue={editingProduct?.stock ?? 0} className="col-span-3" required/>
-                    </div>
-                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="sizes" className="text-right">Sizes</Label>
-                        <Input id="sizes" name="sizes" placeholder="S, M, L, XL" defaultValue={editingProduct?.sizes?.join(', ')} className="col-span-3" required/>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="category" className="text-right">Category</Label>
-                         <Select name="category" defaultValue={editingProduct?.category} required>
-                            <SelectTrigger className="col-span-3">
-                                <SelectValue placeholder="Select a category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {productCategories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-start gap-4">
-                        <Label htmlFor="imageFile" className="text-right pt-2">Image</Label>
-                        <div className="col-span-3 space-y-2">
-                           <Input 
-                                id="imageFile" 
-                                name="imageFile" 
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageFileChange} 
-                                className="col-span-3"
-                            />
-                             <div className="text-center text-xs text-muted-foreground my-2">OR</div>
-                            <Input 
-                                id="imageUrl" 
-                                name="imageUrl" 
-                                type="text" 
-                                placeholder="Paste image URL" 
-                                value={imageUrlInput}
-                                onChange={handleImageUrlChange} 
-                                className="col-span-3"
-                            />
-                            {imagePreview && (
-                                <Image
-                                src={imagePreview}
-                                alt="Product image preview"
-                                width={100}
-                                height={100}
-                                className="rounded-md object-cover mt-2"
-                                />
-                            )}
-                        </div>
-                    </div>
-                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="dataAiHint" className="text-right">AI Hint</Label>
-                        <Input id="dataAiHint" name="dataAiHint" defaultValue={editingProduct?.dataAiHint} className="col-span-3" required/>
-                    </div>
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={handleDialogClose} disabled={isSubmitting}>Cancel</Button>
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Save Product
-                        </Button>
-                    </DialogFooter>
-                </form>
+                <div className="overflow-y-auto pr-6">
+                  <form id="product-form" onSubmit={handleProductFormSubmit} className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="name" className="text-right">Name</Label>
+                          <Input id="name" name="name" defaultValue={editingProduct?.name} className="col-span-3" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="description" className="text-right">Description</Label>
+                          <Textarea id="description" name="description" defaultValue={editingProduct?.description} className="col-span-3 min-h-[100px] md:min-h-[100px]" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="price" className="text-right">Price</Label>
+                          <Input id="price" name="price" type="number" step="0.01" defaultValue={editingProduct?.price} className="col-span-3" required/>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="stock" className="text-right">Stock</Label>
+                          <Input id="stock" name="stock" type="number" step="1" defaultValue={editingProduct?.stock ?? 0} className="col-span-3" required/>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="sizes" className="text-right">Sizes</Label>
+                          <Input id="sizes" name="sizes" placeholder="S, M, L, XL" defaultValue={editingProduct?.sizes?.join(', ')} className="col-span-3" required/>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="category" className="text-right">Category</Label>
+                          <Select name="category" defaultValue={editingProduct?.category} required>
+                              <SelectTrigger className="col-span-3">
+                                  <SelectValue placeholder="Select a category" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                  {productCategories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                      </div>
+                      <div className="grid grid-cols-4 items-start gap-4">
+                          <Label htmlFor="imageUrl" className="text-right pt-2">Image URL</Label>
+                          <div className="col-span-3 space-y-2">
+                              <Input 
+                                  id="imageUrl" 
+                                  name="imageUrl" 
+                                  type="text" 
+                                  placeholder="Paste image URL" 
+                                  value={imageUrlInput}
+                                  onChange={handleImageUrlChange} 
+                                  className="col-span-3"
+                              />
+                              {imagePreview && (
+                                  <Image
+                                  src={imagePreview}
+                                  alt="Product image preview"
+                                  width={100}
+                                  height={100}
+                                  className="rounded-md object-cover mt-2"
+                                  />
+                              )}
+                          </div>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="dataAiHint" className="text-right">AI Hint</Label>
+                          <Input id="dataAiHint" name="dataAiHint" defaultValue={editingProduct?.dataAiHint} className="col-span-3" required/>
+                      </div>
+                  </form>
+                </div>
+                <DialogFooter>
+                    <Button type="button" variant="outline" onClick={handleDialogClose} disabled={isSubmitting}>Cancel</Button>
+                    <Button type="submit" form="product-form" disabled={isSubmitting}>
+                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Save Product
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
 
@@ -374,5 +346,3 @@ export default function AdminProductsPage() {
     </div>
   );
 }
-
-    
