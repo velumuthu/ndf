@@ -1,46 +1,47 @@
+
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // Helper function to check for admin role
     function isAdmin() {
-      // Check if the user's email is in the admin role document.
-      // Use exists() to prevent errors if the document or field doesn't exist.
-      return exists(/databases/$(database)/documents/roles/admin) &&
-             get(/databases/$(database)/documents/roles/admin).data.emails.has(request.auth.token.email);
+      // Check if the user is authenticated and their email is in the admin list.
+      return request.auth != null && exists(/databases/$(database)/documents/roles/admin) && get(/databases/$(database)/documents/roles/admin).data.emails.has(request.auth.token.email);
     }
 
-    // Products: Everyone can read, only admins can write/delete
+    // Products can be read by anyone, but only managed by admins.
     match /products/{productId} {
       allow read: if true;
       allow write, delete: if isAdmin();
     }
 
-    // Offers: Everyone can read, only admins can write/delete
+    // Offers can be read by anyone, but only managed by admins.
     match /offers/{offerId} {
       allow read: if true;
       allow write, delete: if isAdmin();
     }
 
-    // Orders: Users can create their own orders, but not view others'
+    // Authenticated users can create their own orders. Only admins can view all orders (for now, no read access for anyone).
     match /orders/{orderId} {
-      allow read, write: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow create: if request.auth != null;
-    }
-    
-    // Bulk Orders: Logged-in users can create, admins can read/delete
-    match /bulk-orders/{orderId} {
-      allow create: if request.auth != null;
-      allow read, delete: if isAdmin();
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, list, update, delete: if isAdmin();
     }
 
-    // Roles: Admins can manage roles.
-    // A special rule allows any authenticated user to create the initial 'admin' document.
+    // Authenticated users can create bulk orders. Admins can view all bulk orders.
+    match /bulk-orders/{inquiryId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, list, update, delete: if isAdmin();
+    }
+
+    // Role management
     match /roles/{role} {
-       allow read, write: if isAdmin();
-       // Allow creating the admin document if it does not exist yet.
-       // This is for the initial setup.
-       allow create: if role == 'admin' && request.auth != null && !exists(/databases/$(database)/documents/roles/admin);
+       // ANY authenticated user can create the 'admin' document IF it does not exist.
+       // This is a secure way to allow the first admin user to be bootstrapped.
+      allow create: if request.auth != null && role == 'admin' && !exists(/databases/$(database)/documents/roles/admin);
+      
+      // Only existing admins can read or update the roles.
+      allow read, update, delete: if isAdmin();
     }
   }
 }
