@@ -6,12 +6,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,7 +26,25 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Check user role
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists() && userDoc.data().role === 'admin') {
+        // If user is an admin, prevent login through this page
+        await auth.signOut();
+        toast({
+          title: "Admin Account",
+          description: "Please use the admin login page to access the dashboard.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+      
       const redirectUrl = searchParams.get('redirect') || '/profile';
       router.push(redirectUrl);
       toast({
@@ -36,7 +55,7 @@ export default function LoginPage() {
       console.error("Error signing in: ", error);
       toast({
         title: "Login Failed",
-        description: error.message,
+        description: "Invalid email or password.",
         variant: "destructive",
       });
     } finally {
