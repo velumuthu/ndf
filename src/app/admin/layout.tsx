@@ -2,13 +2,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import React from 'react';
 import { cn } from '@/lib/utils';
-import { Package, ShoppingBag, Tag, Users, Shield, LayoutDashboard, MessageSquareHeart } from 'lucide-react';
-import { useAuth } from '@/components/auth-provider';
-import { useAdmin } from '@/hooks/use-admin';
-import { Button } from '@/components/ui/button';
+import { Package, ShoppingBag, Tag, LayoutDashboard, MessageSquareHeart } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
 const adminNavLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -24,46 +22,6 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: adminLoading } = useAdmin();
-  const router = useRouter();
-
-  const loading = authLoading || adminLoading;
-
-  useEffect(() => {
-    if (!loading && !user && pathname !== '/admin/login') {
-      router.push('/admin/login');
-    }
-  }, [loading, user, pathname, router]);
-  
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-  
-  if (!user && pathname !== '/admin/login') {
-     return (
-        <div className="text-center py-16">
-            <h1 className="text-3xl font-bold">Redirecting to login...</h1>
-            <p className="text-muted-foreground mt-2">You must be an administrator to view this page.</p>
-        </div>
-    );
-  }
-
-  if (user && !isAdmin && pathname !== '/admin/login') {
-       return (
-        <div className="text-center py-16">
-            <h1 className="text-3xl font-bold">Administrator Access Only</h1>
-            <p className="text-muted-foreground mt-2">You do not have permission to view this page.</p>
-            <Button onClick={() => router.push('/')} className="mt-4">
-                Go to Homepage
-            </Button>
-        </div>
-    )
-  }
-
-  if (pathname === '/admin/login') {
-    return <>{children}</>;
-  }
 
   return (
     <div className="grid md:grid-cols-[240px_1fr] gap-10">

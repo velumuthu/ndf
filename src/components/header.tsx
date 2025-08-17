@@ -2,28 +2,24 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingCart, User, Shield } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useCart } from './cart-provider';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { MobileNav } from './mobile-nav';
-import { useAuth } from './auth-provider';
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop' },
   { href: '/offers', label: 'Offers' },
   { href: '/bulk-order', label: 'Bulk Orders' },
+  { href: '/admin', label: 'Admin' },
 ];
 
 export function Header() {
   const { cart } = useCart();
-  const { user } = useAuth();
   const pathname = usePathname();
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  const adminLinks = user ? [{ href: '/admin', label: 'Admin' }] : [];
-  const allNavLinks = [...navLinks, ...adminLinks];
 
   return (
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-40 border-b">
@@ -38,18 +34,12 @@ export function Header() {
               href={link.href}
               className={cn(
                 'text-base font-medium transition-colors hover:text-primary',
-                pathname === link.href ? 'text-primary' : 'text-muted-foreground'
+                pathname === link.href || (link.href === '/admin' && pathname.startsWith('/admin')) ? 'text-primary' : 'text-muted-foreground'
               )}
             >
               {link.label}
             </Link>
           ))}
-           {user && (
-             <Link href="/admin" className={cn(
-                'text-base font-medium transition-colors hover:text-primary',
-                pathname.startsWith('/admin') ? 'text-primary' : 'text-muted-foreground'
-              )}>Admin</Link>
-           )}
         </nav>
         <div className="flex items-center space-x-4">
           <Link href="/cart" className="relative group">
@@ -62,7 +52,7 @@ export function Header() {
           </Link>
 
           <div className="md:hidden">
-            <MobileNav navLinks={allNavLinks} />
+            <MobileNav navLinks={navLinks} />
           </div>
         </div>
       </div>
