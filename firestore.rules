@@ -1,41 +1,46 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Products can be read by anyone, but only managed by admins.
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Allow public read access to products
     match /products/{productId} {
       allow read: if true;
-      allow write, delete: if true; // Allow public write for admin panel without auth
+      // Admin operations for products
+      allow write: if true; 
     }
 
-    // Offers can be read by anyone, but only managed by admins.
-    match /offers/{offerId} {
-      allow read: if true;
-      allow write, delete: if true; // Allow public write for admin panel without auth
-    }
-    
-    // Anyone can create orders.
+    // Allow anyone to create orders, bulk orders, and stylist inquiries
     match /orders/{orderId} {
       allow create: if true;
-      allow read, list, update, delete: if true; // Public for now
+      // Allow admin to read and update orders
+      allow read, update: if true;
     }
-
-    // Anyone can create bulk orders.
-    match /bulk-orders/{inquiryId} {
+    match /bulk-orders/{orderId} {
       allow create: if true;
-      allow read, list, update, delete: if true; // Public for now
+      // Allow admin to read bulk orders
+      allow read: if true;
     }
-
-    // Anyone can create stylist inquiries.
-    match /stylist-inquiries/{inquiryId} {
+     match /stylist-inquiries/{inquiryId} {
       allow create: if true;
-      allow read, list, update, delete: if true; // Public for now
+      // Allow admin to read inquiries
+      allow read: if true;
     }
 
-    // Roles collection can be managed by anyone now.
-    match /roles/{role} {
-      allow read, write, create, delete: if true;
+    // Allow public read for active offers, and write for admin
+    match /offers/{offerId} {
+        allow read, write: if true;
+    }
+
+    // Allow public read and write for notifications
+    match /notifications/{notificationId} {
+        allow read, write: if true;
     }
   }
 }
