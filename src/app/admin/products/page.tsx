@@ -323,11 +323,12 @@ export default function AdminProductsPage() {
               <CardTitle>All Products</CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Image</TableHead>
-                    <TableHead>Name</TableHead>
+                    <TableHead className="min-w-[200px]">Name</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Stock</TableHead>
                     <TableHead>Category</TableHead>
@@ -367,6 +368,7 @@ export default function AdminProductsPage() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
           </CardContent>
       </Card>
     </div>

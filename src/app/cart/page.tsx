@@ -143,8 +143,8 @@ export default function CartPage() {
   };
 
   return (
-    <div className="grid md:grid-cols-3 gap-12">
-      <div className="md:col-span-2">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="lg:col-span-2">
         <h1 className="text-3xl font-headline mb-6">Your Shopping Cart</h1>
         {cart.length === 0 ? (
           <div className="text-center py-16 bg-card rounded-lg">
@@ -162,26 +162,26 @@ export default function CartPage() {
                 <Image
                   src={item.product.image}
                   alt={item.product.name}
-                  width={100}
-                  height={120}
+                  width={80}
+                  height={100}
                   className="rounded-md object-cover"
                   data-ai-hint={item.product.dataAiHint}
                 />
                 <div className="ml-4 flex-grow">
-                  <h3 className="font-semibold">{item.product.name}</h3>
+                  <h3 className="font-semibold text-sm sm:text-base">{item.product.name}</h3>
                    {item.size && <p className="text-sm text-muted-foreground">Size: {item.size}</p>}
                   <p className="text-sm text-muted-foreground">₹{item.product.price.toFixed(2)}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.size)}>
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="w-10 text-center">{item.quantity}</span>
+                  <span className="w-8 text-center">{item.quantity}</span>
                   <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.size)}>
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-                <Button variant="ghost" size="icon" className="ml-4 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.product.id, item.size)}>
+                <Button variant="ghost" size="icon" className="ml-2 sm:ml-4 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.product.id, item.size)}>
                   <Trash2 className="h-5 w-5" />
                 </Button>
               </Card>
@@ -189,8 +189,8 @@ export default function CartPage() {
           </div>
         )}
       </div>
-      <div>
-        <Card className="bg-card">
+      <div className="lg:col-span-1">
+        <Card className="bg-card sticky top-24">
           <CardHeader>
             <CardTitle className="font-headline text-2xl">Order Summary</CardTitle>
           </CardHeader>
@@ -224,7 +224,7 @@ export default function CartPage() {
                 <Input name="phone" placeholder="Mobile Number" value={shippingInfo.phone} onChange={handleShippingInfoChange} required />
                 <Input name="address" placeholder="Address" value={shippingInfo.address} onChange={handleShippingInfoChange} required />
                 <Input name="city" placeholder="City" value={shippingInfo.city} onChange={handleShippingInfoChange} required />
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                     <Input name="state" placeholder="State" value={shippingInfo.state} onChange={handleShippingInfoChange} required />
                     <Input name="zip" placeholder="ZIP Code" value={shippingInfo.zip} onChange={handleShippingInfoChange} required />
                 </div>

@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import axios from 'axios';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -38,26 +39,31 @@ export default function ShopPage() {
       </div>
 
        {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-8">
-            <Skeleton className="h-[450px] w-full" />
-            <Skeleton className="h-[450px] w-full" />
-            <Skeleton className="h-[450px] w-full" />
-            <Skeleton className="h-[450px] w-full" />
-            <Skeleton className="h-[450px] w-full" />
-            <Skeleton className="h-[450px] w-full" />
-            <Skeleton className="h-[450px] w-full" />
-            <Skeleton className="h-[450px] w-full" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mt-8">
+            <Skeleton className="h-[350px] md:h-[450px] w-full" />
+            <Skeleton className="h-[350px] md:h-[450px] w-full" />
+            <Skeleton className="h-[350px] md:h-[450px] w-full" />
+            <Skeleton className="h-[350px] md:h-[450px] w-full" />
+            <Skeleton className="h-[350px] md:h-[450px] w-full" />
+            <Skeleton className="h-[350px] md:h-[450px] w-full" />
+            <Skeleton className="h-[350px] md:h-[450px] w-full" />
+            <Skeleton className="h-[350px] md:h-[450px] w-full" />
         </div>
        ) : (
          <Tabs defaultValue="All" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 md:w-auto md:mx-auto md:grid-cols-10">
-              {categories.map(category => (
-                <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
-              ))}
-            </TabsList>
+            <div className="flex justify-center">
+              <ScrollArea className="w-full max-w-full whitespace-nowrap rounded-lg">
+                <TabsList className="inline-flex">
+                  {categories.map(category => (
+                    <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
+                  ))}
+                </TabsList>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </div>
             
             <TabsContent value="All">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mt-8">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -65,7 +71,7 @@ export default function ShopPage() {
             </TabsContent>
             {categories.slice(1).map(category => (
                <TabsContent key={category} value={category}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mt-8">
                   {products.filter(p => p.category === category).map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}

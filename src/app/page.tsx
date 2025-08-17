@@ -54,11 +54,11 @@ export default function Home() {
           </Button>
         </div>
         {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <Skeleton className="h-[450px] w-full" />
-                <Skeleton className="h-[450px] w-full" />
-                <Skeleton className="h-[450px] w-full" />
-                <Skeleton className="h-[450px] w-full" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+                <Skeleton className="h-[350px] md:h-[450px] w-full" />
+                <Skeleton className="h-[350px] md:h-[450px] w-full" />
+                <Skeleton className="h-[350px] md:h-[450px] w-full" />
+                <Skeleton className="h-[350px] md:h-[450px] w-full" />
             </div>
         ) : (
           <Carousel
@@ -76,13 +76,13 @@ export default function Home() {
           >
             <CarouselContent>
               {trendingProducts.map((product) => (
-                <CarouselItem key={product.id} className="sm:basis-1/2 lg:basis-1/4">
+                <CarouselItem key={product.id} className="basis-1/2 md:basis-1/3 lg:basis-1/4">
                   <ProductCard product={product} />
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious className="hidden sm:flex" />
+            <CarouselNext className="hidden sm:flex" />
           </Carousel>
         )}
       </section>
