@@ -2,11 +2,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ShoppingCart, LogOut, User } from 'lucide-react';
 import { useCart } from './cart-provider';
 import { cn } from '@/lib/utils';
-import React from 'react';
+import React, { useState } from 'react';
 import { MobileNav } from './mobile-nav';
 import { useAuth } from './auth-provider';
 import { Button } from './ui/button';
@@ -30,14 +30,27 @@ export function Header() {
   const { cart } = useCart();
   const { user, loading, logout } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
+  const [logoClicks, setLogoClicks] = useState(0);
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleLogoClick = () => {
+    const newClickCount = logoClicks + 1;
+    setLogoClicks(newClickCount);
+    if (newClickCount >= 6) {
+      router.push('/admin/login');
+      setLogoClicks(0); // Reset after redirect
+    }
+  };
 
   return (
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-40 border-b">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-xl font-headline font-bold text-foreground hover:text-primary transition-colors">
-          Namma Dream Fashion
-        </Link>
+        <div onClick={handleLogoClick} className="cursor-pointer">
+           <Link href="/" className="text-xl font-headline font-bold text-foreground hover:text-primary transition-colors">
+              Namma Dream Fashion
+           </Link>
+        </div>
         <nav className="hidden md:flex items-center space-x-8">
           {navLinks.map((link) => (
             <Link
