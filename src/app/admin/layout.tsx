@@ -2,14 +2,13 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import React from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Package, ShoppingBag, Tag, Users, Shield, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/components/auth-provider';
 import { useAdmin } from '@/hooks/use-admin';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 
 const adminNavLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -29,16 +28,21 @@ export default function AdminLayout({
   const router = useRouter();
 
   const loading = authLoading || adminLoading;
+
+  useEffect(() => {
+    if (!loading && !user && pathname !== '/admin/login') {
+      router.push('/admin/login');
+    }
+  }, [loading, user, pathname, router]);
   
   if (loading) {
     return <div>Loading...</div>;
   }
   
   if (!user && pathname !== '/admin/login') {
-     router.push('/admin/login');
      return (
         <div className="text-center py-16">
-            <h1 className="text-3xl font-bold">Redirecting...</h1>
+            <h1 className="text-3xl font-bold">Redirecting to login...</h1>
             <p className="text-muted-foreground mt-2">You must be an administrator to view this page.</p>
         </div>
     );
