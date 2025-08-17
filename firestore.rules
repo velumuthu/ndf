@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check for admin role
+    function isAdmin() {
+      // Check if the user is authenticated and if their email is in the admin list
+      return request.auth != null && get(/databases/$(database)/documents/roles/admin).data.emails.hasAny([request.auth.token.email]);
+    }
+
+    // Products can be read by anyone, but only managed by admins.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Offers can be read by anyone if active, but only managed by admins.
+    match /offers/{offerId} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Orders can be created by authenticated users and read by admins.
+    match /orders/{orderId} {
+      allow create: if request.auth != null;
+      allow read, write: if isAdmin();
+    }
+    
+    // Bulk orders can be created by authenticated users and read by admins.
+    match /bulk-orders/{bulkOrderId} {
+        allow create: if request.auth != null;
+        allow read, write: if isAdmin();
+    }
+
+    // Admin role document can be read by authenticated users to check their status.
+    match /roles/admin {
+        allow get: if request.auth != null;
+        // writes should only be done from the Firebase console
+        allow write: if false; 
+    }
+
+  }
+}
