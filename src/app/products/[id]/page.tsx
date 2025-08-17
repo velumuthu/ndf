@@ -14,6 +14,7 @@ import { useCart } from '@/components/cart-provider';
 import { ProductCard } from '@/components/product-card';
 import { ShoppingCart, Zap, ArrowLeft } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -36,7 +37,7 @@ export default function ProductDetailPage() {
           const productData = { id: docSnap.id, ...docSnap.data() } as Product;
           setProduct(productData);
           
-          if(productData.sizes.length > 0) {
+          if(productData.sizes && productData.sizes.length > 0) {
             setSelectedSize(productData.sizes[0]);
           }
 
@@ -66,7 +67,7 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     if (product) {
-      if (product.sizes.length > 0 && !selectedSize) {
+      if (product.sizes?.length > 0 && !selectedSize) {
         alert("Please select a size.");
         return;
       }
@@ -130,7 +131,7 @@ export default function ProductDetailPage() {
           <p className="text-3xl font-semibold">₹{product.price.toFixed(2)}</p>
           <p className="text-muted-foreground leading-relaxed">{product.description}</p>
           
-          {product.sizes.length > 0 && (
+          {product.sizes?.length > 0 && (
              <div className="space-y-2">
                 <Label className="text-lg font-medium">Size</Label>
                 <div className="flex flex-wrap gap-2">
