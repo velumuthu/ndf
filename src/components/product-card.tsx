@@ -7,7 +7,8 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { useCart } from './cart-provider';
 import type { Product } from '@/lib/types';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Zap } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface ProductCardProps {
   product: Product;
@@ -15,6 +16,12 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const router = useRouter();
+
+  const handleOrderNow = () => {
+    addToCart(product);
+    router.push('/cart');
+  };
 
   return (
     <Card className="flex flex-col overflow-hidden h-full group transition-all duration-300 border-0 bg-transparent shadow-none rounded-none">
@@ -41,14 +48,24 @@ export function ProductCard({ product }: ProductCardProps) {
         </p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <Button
-          onClick={() => addToCart(product)}
-          variant="secondary"
-          className="w-full font-bold"
-        >
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          Add to Cart
-        </Button>
+        <div className="w-full flex items-center gap-2">
+            <Button
+              onClick={() => addToCart(product)}
+              variant="secondary"
+              className="w-full font-bold"
+            >
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Add to Cart
+            </Button>
+             <Button
+              onClick={handleOrderNow}
+              variant="default"
+              className="w-full font-bold"
+            >
+              <Zap className="mr-2 h-4 w-4" />
+              Order Now
+            </Button>
+        </div>
       </CardFooter>
     </Card>
   );
