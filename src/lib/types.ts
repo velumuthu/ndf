@@ -21,6 +21,7 @@ export type Order = {
   totalPrice: number;
   shippingInfo: {
     name: string;
+    phone: string;
     address: string;
     city: string;
     state: string;
@@ -48,6 +49,12 @@ export type Offer = {
     description: string;
     couponCode: string;
     discountPercentage: number;
+    active: boolean;
+}
+
+export type Notification = {
+    id: string;
+    message: string;
     active: boolean;
 }
 

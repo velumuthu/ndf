@@ -131,6 +131,7 @@ export default function AdminOrdersPage() {
                         <div>
                           <h4 className="font-semibold mb-2">Shipping Details</h4>
                           <p>{order.shippingInfo.name}</p>
+                           <p>{order.shippingInfo.phone || 'N/A'}</p>
                           <p>{order.shippingInfo.address}</p>
                           <p>{order.shippingInfo.city}, {order.shippingInfo.state} {order.shippingInfo.zip}</p>
                         </div>

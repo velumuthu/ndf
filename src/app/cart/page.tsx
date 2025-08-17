@@ -31,6 +31,7 @@ export default function CartPage() {
   const { toast } = useToast();
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
+    phone: '',
     address: '',
     city: '',
     state: '',
@@ -107,7 +108,7 @@ export default function CartPage() {
         description: 'Your cash on delivery order has been confirmed. We will contact you shortly.',
       });
       clearCart();
-      setShippingInfo({ name: '', address: '', city: '', state: '', zip: '' });
+      setShippingInfo({ name: '', phone: '', address: '', city: '', state: '', zip: '' });
       setCouponCode('');
       setDiscount(0);
     } catch (error) {
@@ -197,19 +198,20 @@ export default function CartPage() {
              <Separator />
              <div className="space-y-2">
                 <h3 className="font-semibold">Shipping Information</h3>
-                <Input name="name" placeholder="Full Name" value={shippingInfo.name} onChange={handleShippingInfoChange} />
-                <Input name="address" placeholder="Address" value={shippingInfo.address} onChange={handleShippingInfoChange} />
-                <Input name="city" placeholder="City" value={shippingInfo.city} onChange={handleShippingInfoChange} />
+                <Input name="name" placeholder="Full Name" value={shippingInfo.name} onChange={handleShippingInfoChange} required />
+                <Input name="phone" placeholder="Mobile Number" value={shippingInfo.phone} onChange={handleShippingInfoChange} required />
+                <Input name="address" placeholder="Address" value={shippingInfo.address} onChange={handleShippingInfoChange} required />
+                <Input name="city" placeholder="City" value={shippingInfo.city} onChange={handleShippingInfoChange} required />
                 <div className="flex gap-2">
-                    <Input name="state" placeholder="State" value={shippingInfo.state} onChange={handleShippingInfoChange} />
-                    <Input name="zip" placeholder="ZIP Code" value={shippingInfo.zip} onChange={handleShippingInfoChange} />
+                    <Input name="state" placeholder="State" value={shippingInfo.state} onChange={handleShippingInfoChange} required />
+                    <Input name="zip" placeholder="ZIP Code" value={shippingInfo.zip} onChange={handleShippingInfoChange} required />
                 </div>
              </div>
           </CardContent>
           <CardFooter>
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <Button className="w-full" size="lg">Confirm Cash on Delivery Order</Button>
+                    <Button className="w-full" size="lg" disabled={!totalPrice}>Confirm Cash on Delivery Order</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>
