@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Package, ShoppingBag, Tag, Users } from 'lucide-react';
+import { Package, ShoppingBag, Tag, Users, Shield } from 'lucide-react';
 import { useAuth } from '@/components/auth-provider';
 import { useAdmin } from '@/hooks/use-admin';
 import { Button } from '@/components/ui/button';
@@ -33,19 +33,19 @@ export default function AdminLayout({
     return <div>Loading...</div>;
   }
   
-  if (!user) {
-    return (
+  // If trying to access a page other than login while not logged in
+  if (!user && pathname !== '/admin/login') {
+     router.push('/admin/login');
+     return (
         <div className="text-center py-16">
-            <h1 className="text-3xl font-bold">Access Denied</h1>
-            <p className="text-muted-foreground mt-2">You must be logged in to view this page.</p>
-            <Button asChild className="mt-4">
-                <Link href="/login">Login</Link>
-            </Button>
+            <h1 className="text-3xl font-bold">Redirecting...</h1>
+            <p className="text-muted-foreground mt-2">You must be an administrator to view this page.</p>
         </div>
-    )
+    );
   }
 
-  if (!isAdmin) {
+  // If logged in but not an admin
+  if (user && !isAdmin) {
        return (
         <div className="text-center py-16">
             <h1 className="text-3xl font-bold">Administrator Access Only</h1>
@@ -57,10 +57,18 @@ export default function AdminLayout({
     )
   }
 
+  // Allow access to the login page itself without the layout
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
   return (
     <div className="grid md:grid-cols-[240px_1fr] gap-10">
       <aside>
         <nav className="flex flex-col space-y-2">
+           <Link href="/" className="text-xl font-headline font-bold text-foreground hover:text-primary transition-colors mb-6 flex items-center gap-2">
+              <Shield /> Admin Panel
+            </Link>
           {adminNavLinks.map(link => {
             const Icon = link.icon;
             return (
