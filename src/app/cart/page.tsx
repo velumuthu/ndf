@@ -8,26 +8,72 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
-import React from 'react';
+import { Minus, Plus, Trash2, ShoppingCart, Info } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { useAuth } from '@/components/auth-provider';
+import type { Offer } from '@/lib/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [shippingInfo, setShippingInfo] = React.useState({
+  const [shippingInfo, setShippingInfo] = useState({
     name: '',
     address: '',
     city: '',
     state: '',
     zip: '',
   });
+  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [finalPrice, setFinalPrice] = useState(totalPrice);
 
+  useEffect(() => {
+    setFinalPrice(totalPrice * (1 - discount));
+  }, [totalPrice, discount]);
+  
   const handleShippingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setShippingInfo(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) {
+      toast({ title: "Please enter a coupon code.", variant: "destructive" });
+      return;
+    }
+    try {
+      const offerDoc = await getDoc(doc(db, 'offers', couponCode));
+      if (offerDoc.exists()) {
+        const offer = offerDoc.data() as Offer;
+        if (offer.active) {
+            setDiscount(offer.discountPercentage / 100);
+            toast({ title: "Coupon Applied!", description: `${offer.discountPercentage}% off your order.` });
+        } else {
+            toast({ title: "Coupon is not active.", variant: "destructive" });
+        }
+      } else {
+        toast({ title: "Invalid coupon code.", variant: "destructive" });
+      }
+    } catch (error) {
+        console.error("Error applying coupon: ", error);
+        toast({ title: "Error applying coupon.", variant: "destructive" });
+    }
+  };
+
 
   const handlePlaceOrder = async () => {
     if (cart.length === 0) {
@@ -51,9 +97,10 @@ export default function CartPage() {
     try {
       await addDoc(collection(db, 'orders'), {
         cart,
-        totalPrice,
+        totalPrice: finalPrice,
         shippingInfo,
         createdAt: serverTimestamp(),
+        userId: user?.uid,
       });
       toast({
         title: 'Order Placed!',
@@ -61,6 +108,8 @@ export default function CartPage() {
       });
       clearCart();
       setShippingInfo({ name: '', address: '', city: '', state: '', zip: '' });
+      setCouponCode('');
+      setDiscount(0);
     } catch (error) {
       console.error("Error placing order: ", error);
       toast({
@@ -71,6 +120,19 @@ export default function CartPage() {
     }
   };
   
+  if (!user) {
+    return (
+      <div className="text-center py-16 bg-card rounded-lg">
+          <Info className="mx-auto h-16 w-16 text-primary" />
+          <h2 className="mt-4 text-2xl font-semibold">Please Log In</h2>
+          <p className="mt-2 text-muted-foreground">You need to be logged in to view your cart and place orders.</p>
+          <Button asChild className="mt-6">
+            <Link href="/login">Login or Sign Up</Link>
+          </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="grid md:grid-cols-3 gap-12">
       <div className="md:col-span-2">
@@ -127,14 +189,23 @@ export default function CartPage() {
               <span>Subtotal</span>
               <span>${totalPrice.toFixed(2)}</span>
             </div>
+             <div className="flex justify-between text-destructive">
+                <span>Discount</span>
+                <span>-${(totalPrice - finalPrice).toFixed(2)}</span>
+            </div>
             <div className="flex justify-between">
               <span>Shipping</span>
               <span>Free</span>
             </div>
             <Separator />
+             <div className="flex gap-2">
+                <Input placeholder="Coupon Code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
+                <Button onClick={handleApplyCoupon}>Apply</Button>
+            </div>
+            <Separator />
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
-              <span>${totalPrice.toFixed(2)}</span>
+              <span>${finalPrice.toFixed(2)}</span>
             </div>
              <Separator />
              <div className="space-y-2">
@@ -149,9 +220,23 @@ export default function CartPage() {
              </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" size="lg" onClick={handlePlaceOrder}>
-              Place Order
-            </Button>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button className="w-full" size="lg">Place Order</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Your Order</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Please review your order details before confirming. Total: ${finalPrice.toFixed(2)}.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handlePlaceOrder}>Confirm & Pay</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
           </CardFooter>
         </Card>
       </div>

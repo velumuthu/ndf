@@ -9,9 +9,14 @@ import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import { db } from '@/lib/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { useAuth } from "@/components/auth-provider";
+import { Info } from "lucide-react";
+import Link from "next/link";
+
 
 export default function BulkOrderPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,6 +28,7 @@ export default function BulkOrderPage() {
       await addDoc(collection(db, 'bulk-orders'), {
         ...data,
         createdAt: serverTimestamp(),
+        userId: user?.uid,
       });
       toast({
         title: "Inquiry Submitted!",
@@ -38,6 +44,19 @@ export default function BulkOrderPage() {
       });
     }
   };
+
+  if (!user) {
+    return (
+       <div className="text-center py-16 bg-card rounded-lg max-w-2xl mx-auto">
+          <Info className="mx-auto h-16 w-16 text-primary" />
+          <h2 className="mt-4 text-2xl font-semibold">Please Log In</h2>
+          <p className="mt-2 text-muted-foreground">You need to be logged in to submit a bulk order inquiry.</p>
+          <Button asChild className="mt-6">
+            <Link href="/login">Login or Sign Up</Link>
+          </Button>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -63,7 +82,7 @@ export default function BulkOrderPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" name="email" type="email" placeholder="jane.doe@example.com" required />
+                <Input id="email" name="email" type="email" placeholder="jane.doe@example.com" required defaultValue={user?.email || ''} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>

@@ -8,6 +8,7 @@ import { Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from './ui/sheet';
 import { cn } from '@/lib/utils';
+import { useAuth } from './auth-provider';
 
 interface NavLink {
     href: string;
@@ -21,11 +22,16 @@ interface MobileNavProps {
 export function MobileNav({ navLinks }: MobileNavProps) {
     const [open, setOpen] = useState(false);
     const [isClient, setIsClient] = useState(false);
+    const { user } = useAuth();
     const pathname = usePathname();
 
     useEffect(() => {
         setIsClient(true);
     }, []);
+
+    const allLinks = user 
+        ? navLinks 
+        : navLinks.filter(link => link.href !== '/admin/products');
 
     if (!isClient) {
         return (
@@ -46,7 +52,7 @@ export function MobileNav({ navLinks }: MobileNavProps) {
                 <SheetTitle className="sr-only">Namma Dream Fashion</SheetTitle>
                 <SheetDescription className="sr-only">Mobile Navigation Menu</SheetDescription>
                 <div className="flex flex-col space-y-2 pt-10">
-                    {navLinks.map((link) => (
+                    {allLinks.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}

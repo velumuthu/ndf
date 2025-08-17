@@ -52,7 +52,7 @@ export default function ShopPage() {
         </div>
        ) : (
          <Tabs defaultValue="All" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 md:w-auto md:mx-auto md:grid-cols-9">
+            <TabsList className="grid w-full grid-cols-4 md:w-auto md:mx-auto md:grid-cols-10">
               {categories.map(category => (
                 <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
               ))}

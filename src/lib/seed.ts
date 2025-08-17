@@ -1,6 +1,6 @@
 
 import { db } from './firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
 
 const products = [
   {
@@ -122,15 +122,36 @@ const products = [
     trending: true,
     description: 'A classic pleated A-line skirt for a touch of elegance.',
     dataAiHint: 'pleated skirt'
+  },
+  {
+    id: '13',
+    name: 'Branded Logo T-Shirt',
+    price: 49.99,
+    image: 'https://placehold.co/600x800.png',
+    category: 'Branded',
+    trending: true,
+    description: 'A stylish t-shirt featuring our exclusive brand logo.',
+    dataAiHint: 'logo t-shirt'
+  },
+  {
+    id: '14',
+    name: 'Branded Performance Shorts',
+    price: 55.99,
+    image: 'https://placehold.co/600x800.png',
+    category: 'Branded',
+    trending: false,
+    description: 'High-performance shorts with subtle branding, perfect for workouts.',
+    dataAiHint: 'branded shorts'
   }
 ];
 
 export async function seedProducts() {
-  const productsCollection = collection(db, 'products');
   console.log('Seeding products...');
   for (const product of products) {
     try {
-      await addDoc(productsCollection, product);
+      // Use the product's own id when creating the document
+      const productRef = doc(db, 'products', product.id);
+      await setDoc(productRef, product);
       console.log(`Added product: ${product.name}`);
     } catch (error) {
       console.error(`Error adding product ${product.name}:`, error);
