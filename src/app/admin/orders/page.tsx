@@ -152,6 +152,7 @@ export default function AdminOrdersPage() {
                     </div>
 
                     <h4 className="font-semibold mt-6 mb-2">Ordered Items</h4>
+                    <div className="overflow-x-auto">
                      <Table>
                         <TableHeader>
                           <TableRow>
@@ -174,6 +175,7 @@ export default function AdminOrdersPage() {
                           ))}
                         </TableBody>
                       </Table>
+                      </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
