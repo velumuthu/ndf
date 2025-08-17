@@ -1,12 +1,12 @@
+
 'use client';
 
 import { ProductCard } from '@/components/product-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React, { useState, useEffect } from 'react';
-import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import axios from 'axios';
 
 export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -15,10 +15,8 @@ export default function ShopPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const productsCollection = collection(db, 'products');
-        const productSnapshot = await getDocs(productsCollection);
-        const productList = productSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
-        setProducts(productList);
+        const response = await axios.get('/api/products');
+        setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {

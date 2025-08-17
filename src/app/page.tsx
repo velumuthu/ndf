@@ -6,12 +6,11 @@ import { ProductCard } from "@/components/product-card";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
 import type { Product } from "@/lib/types";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Skeleton } from "@/components/ui/skeleton";
+import axios from "axios";
 
 export default function Home() {
   const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
@@ -20,14 +19,8 @@ export default function Home() {
   useEffect(() => {
     const fetchTrendingProducts = async () => {
       try {
-        const productsCollection = collection(db, "products");
-        const q = query(productsCollection, where("trending", "==", true));
-        const querySnapshot = await getDocs(q);
-        const products: Product[] = [];
-        querySnapshot.forEach((doc) => {
-          products.push({ id: doc.id, ...doc.data() } as Product);
-        });
-        setTrendingProducts(products);
+        const response = await axios.get('/api/products/trending');
+        setTrendingProducts(response.data);
       } catch (error) {
         console.error("Error fetching trending products:", error);
       } finally {
