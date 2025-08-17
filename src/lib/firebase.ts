@@ -4,12 +4,12 @@ import { getStorage } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDiw_pwLGHMjtTRmhI3bmRhx497XW1l1bY",
+  authDomain: "atelier-lumire-y3pcz.firebaseapp.com",
+  projectId: "atelier-lumire-y3pcz",
+  storageBucket: "atelier-lumire-y3pcz.firebasestorage.app",
+  messagingSenderId: "1067978357535",
+  appId: "1:1067978357535:web:3d1e593cd3dc740ccd8e2a",
 };
 
 // Initialize Firebase
