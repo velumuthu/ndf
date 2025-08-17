@@ -126,7 +126,6 @@ export default function ProductDetailPage() {
             <Badge variant={product.stock > 0 ? 'secondary' : 'destructive'}>
                 {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
             </Badge>
-            <span className="ml-2 text-muted-foreground">({product.stock} available)</span>
           </div>
           <p className="text-3xl font-semibold">₹{product.price.toFixed(2)}</p>
           <p className="text-muted-foreground leading-relaxed">{product.description}</p>
