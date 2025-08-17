@@ -195,30 +195,32 @@ export default function CartPage() {
             <CardTitle className="font-headline text-2xl">Order Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>₹{totalPrice.toFixed(2)}</span>
-            </div>
-             <div className="flex justify-between text-destructive">
-                <span>Discount</span>
-                <span>-₹{(totalPrice - finalPrice).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>Free</span>
-            </div>
-            <Separator />
-             <div className="flex gap-2">
-                <Input placeholder="Coupon Code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
-                <Button onClick={handleApplyCoupon}>Apply</Button>
-            </div>
-            <Separator />
-            <div className="flex justify-between font-bold text-lg">
-              <span>Total</span>
-              <span>₹{finalPrice.toFixed(2)}</span>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>₹{totalPrice.toFixed(2)}</span>
+              </div>
+               <div className="flex justify-between text-destructive">
+                  <span>Discount</span>
+                  <span>-₹{(totalPrice - finalPrice).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span>Free</span>
+              </div>
+              <Separator />
+               <div className="flex gap-2">
+                  <Input placeholder="Coupon Code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
+                  <Button onClick={handleApplyCoupon}>Apply</Button>
+              </div>
+              <Separator />
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total</span>
+                <span>₹{finalPrice.toFixed(2)}</span>
+              </div>
             </div>
              <Separator />
-             <div className="space-y-2">
+             <div className="space-y-2 mt-4">
                 <h3 className="font-semibold">Shipping Information</h3>
                 <Input name="name" placeholder="Full Name" value={shippingInfo.name} onChange={handleShippingInfoChange} required />
                 <Input name="phone" placeholder="Mobile Number" value={shippingInfo.phone} onChange={handleShippingInfoChange} required />
@@ -254,3 +256,5 @@ export default function CartPage() {
     </div>
   );
 }
+
+    

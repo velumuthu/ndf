@@ -245,7 +245,7 @@ export default function AdminProductsPage() {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="description" className="text-right">Description</Label>
-                        <Textarea id="description" name="description" defaultValue={editingProduct?.description} className="col-span-3" required />
+                        <Textarea id="description" name="description" defaultValue={editingProduct?.description} className="col-span-3 min-h-[100px] md:min-h-[100px]" required />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="price" className="text-right">Price</Label>
@@ -374,3 +374,5 @@ export default function AdminProductsPage() {
     </div>
   );
 }
+
+    

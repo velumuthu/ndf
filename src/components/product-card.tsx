@@ -40,17 +40,17 @@ export function ProductCard({ product }: ProductCardProps) {
         {product.stock === 0 && <Badge variant="destructive" className="absolute top-3 right-3">Out of Stock</Badge>}
       </CardHeader>
       <CardContent className="p-4 flex-grow">
-        <CardTitle className="text-lg font-semibold leading-snug">
+        <CardTitle className="text-base sm:text-lg font-semibold leading-snug">
           <Link href={`/products/${product.id}`} className="hover:text-primary transition-colors">
             {product.name}
           </Link>
         </CardTitle>
-        <p className="text-lg font-bold text-foreground mt-2">
+        <p className="text-base sm:text-lg font-bold text-foreground mt-2">
           ₹{product.price.toFixed(2)}
         </p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <div className="w-full flex flex-col sm:flex-row items-center gap-2">
+        <div className="w-full flex flex-col items-center gap-2">
             <Button
               onClick={() => addToCart(product)}
               variant="secondary"
@@ -74,3 +74,5 @@ export function ProductCard({ product }: ProductCardProps) {
     </Card>
   );
 }
+
+    

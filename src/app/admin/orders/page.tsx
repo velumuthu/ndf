@@ -114,12 +114,12 @@ export default function AdminOrdersPage() {
             {orders.map(order => (
               <AccordionItem value={order.id!} key={order.id}>
                 <AccordionTrigger>
-                  <div className="flex justify-between w-full pr-4">
+                  <div className="flex flex-col sm:flex-row justify-between w-full pr-4 text-left sm:items-center">
                     <div>
                       <p className="font-semibold">{order.shippingInfo.name}</p>
                       <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
                     </div>
-                     <div className="text-right">
+                     <div className="text-left sm:text-right mt-2 sm:mt-0">
                        <p className="font-bold">₹{order.totalPrice.toFixed(2)}</p>
                        <Badge variant={order.status === 'Shipped' ? 'default' : 'secondary'}>{order.status}</Badge>
                      </div>
@@ -186,3 +186,5 @@ export default function AdminOrdersPage() {
     </div>
   );
 }
+
+    
