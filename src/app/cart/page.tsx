@@ -26,10 +26,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/components/auth-provider';
+import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
+  const router = useRouter();
   const { toast } = useToast();
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
@@ -84,6 +86,16 @@ export default function CartPage() {
 
 
   const handlePlaceOrder = async () => {
+     if (!user) {
+      toast({
+        title: 'Login Required',
+        description: 'Please log in to place an order.',
+        variant: 'destructive',
+      });
+      router.push('/login?redirect=/cart');
+      return;
+    }
+
     if (cart.length === 0) {
       toast({
         title: "Your cart is empty",
@@ -119,6 +131,7 @@ export default function CartPage() {
       setShippingInfo({ name: '', phone: '', address: '', city: '', state: '', zip: '' });
       setCouponCode('');
       setDiscount(0);
+      router.push('/profile');
     } catch (error) {
       console.error("Error placing order: ", error);
       toast({

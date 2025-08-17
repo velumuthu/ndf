@@ -27,6 +27,8 @@ export type User = {
   role: 'admin' | 'customer';
 };
 
+export type UserDetails = User;
+
 export type Order = {
   id?: string;
   cart: CartItem[];
@@ -82,6 +84,7 @@ export type StylistInquiry = {
 
 export type AuthContextType = {
   user: FirebaseUser | null;
+  userDetails: UserDetails | null;
   loading: boolean;
   logout: () => Promise<void>;
 };

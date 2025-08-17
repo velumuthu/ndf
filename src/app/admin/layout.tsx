@@ -27,17 +27,21 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, loading, logout } = useAuth();
+  const { user, userDetails, loading, logout } = useAuth();
   const router = useRouter();
 
   React.useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login?redirect=/admin');
+    if (!loading) {
+      if (!user) {
+        router.push('/login?redirect=/admin');
+      } else if (userDetails && userDetails.role !== 'admin') {
+        router.push('/'); // Redirect non-admins to home page
+      }
     }
-  }, [user, loading, router]);
+  }, [user, userDetails, loading, router]);
   
-  if (loading || !user) {
-    return <div className="flex justify-center items-center h-screen"><p>Loading...</p></div>
+  if (loading || !user || !userDetails || userDetails.role !== 'admin') {
+    return <div className="flex justify-center items-center h-screen"><p>Loading & Verifying Access...</p></div>
   }
 
   return (
