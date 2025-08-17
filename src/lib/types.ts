@@ -20,6 +20,13 @@ export type CartItem = {
   size?: string;
 };
 
+export type User = {
+  uid: string;
+  email: string;
+  displayName: string;
+  role: 'admin' | 'customer';
+};
+
 export type Order = {
   id?: string;
   cart: CartItem[];
