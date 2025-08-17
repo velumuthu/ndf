@@ -1,9 +1,9 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { db, storage } from '@/lib/firebase';
-import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, writeBatch } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import type { Product } from '@/lib/types';
 import { Switch } from '@/components/ui/switch';
@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Trash2, Edit, Loader2 } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, Loader2, Upload } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +27,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Papa from 'papaparse';
+
 
 const productCategories: Product['category'][] = ['Dresses', 'Accessories', 'Combos', 'Shirts', 'Pants', 'Sportswear', 'Formals', 'Casuals', 'Branded'];
 
@@ -39,6 +41,7 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrlInput, setImageUrlInput] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
 
   const fetchProducts = useCallback(async () => {
@@ -176,6 +179,81 @@ export default function AdminProductsPage() {
         setIsSubmitting(false);
       }
   }
+
+    const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+            toast({ title: "No file selected", variant: "destructive" });
+            return;
+        }
+
+        setIsSubmitting(true);
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: async (results) => {
+                const productsToAdd = results.data as any[];
+
+                if (productsToAdd.length === 0) {
+                    toast({ title: "CSV is empty or invalid", variant: "destructive" });
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                try {
+                    const batch = writeBatch(db);
+                    let count = 0;
+
+                    for (const prod of productsToAdd) {
+                        // Basic validation
+                        if (!prod.name || !prod.price || !prod.category || !prod.image) {
+                            console.warn("Skipping invalid row:", prod);
+                            continue;
+                        }
+
+                        const newProductRef = doc(collection(db, "products"));
+                        const newProduct: Omit<Product, 'id'> = {
+                            name: prod.name,
+                            description: prod.description || '',
+                            price: parseFloat(prod.price),
+                            stock: parseInt(prod.stock || '0', 10),
+                            sizes: prod.sizes ? prod.sizes.split(',').map((s: string) => s.trim()) : [],
+                            category: prod.category as Product['category'],
+                            dataAiHint: prod.dataAiHint || prod.name.toLowerCase().split(' ').slice(0, 2).join(' '),
+                            trending: prod.trending ? prod.trending.toLowerCase() === 'true' : false,
+                            image: prod.image,
+                        };
+                        batch.set(newProductRef, newProduct);
+                        count++;
+                    }
+
+                    if (count > 0) {
+                        await batch.commit();
+                        toast({ title: "Success!", description: `${count} products have been added successfully.` });
+                        fetchProducts();
+                    } else {
+                        toast({ title: "No valid products found", description: "Please check your CSV file format.", variant: "destructive" });
+                    }
+
+                } catch (error) {
+                    console.error("Error batch adding products: ", error);
+                    toast({ title: "Error", description: "Could not add products from CSV.", variant: "destructive" });
+                } finally {
+                    setIsSubmitting(false);
+                    // Reset file input
+                    if(fileInputRef.current) fileInputRef.current.value = '';
+                }
+            },
+            error: (error: any) => {
+                toast({ title: "CSV Parsing Error", description: error.message, variant: "destructive" });
+                setIsSubmitting(false);
+            }
+        });
+    };
+
+    const triggerCsvUpload = () => {
+        fileInputRef.current?.click();
+    };
   
   if (loading) {
     return (
@@ -202,11 +280,18 @@ export default function AdminProductsPage() {
 
   return (
     <div className="container mx-auto">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 gap-2">
         <h1 className="text-3xl font-headline">Manage Products</h1>
-         <Button onClick={() => handleOpenDialog()}>
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Product
-        </Button>
+         <div className="flex gap-2">
+            <input type="file" ref={fileInputRef} onChange={handleCsvUpload} accept=".csv" className="hidden" disabled={isSubmitting}/>
+            <Button onClick={triggerCsvUpload} variant="outline" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                Import from CSV
+            </Button>
+            <Button onClick={() => handleOpenDialog()}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Add Product
+            </Button>
+        </div>
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
