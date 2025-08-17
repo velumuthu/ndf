@@ -2,42 +2,45 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check for admin role
+    // Helper functions
     function isAdmin() {
-      // Check if the user is authenticated and if their email is in the admin list
-      return request.auth != null && get(/databases/$(database)/documents/roles/admin).data.emails.hasAny([request.auth.token.email]);
+      // Check if the user's email is in the admin role document.
+      // Use exists() to prevent errors if the document or field doesn't exist.
+      return exists(/databases/$(database)/documents/roles/admin) &&
+             get(/databases/$(database)/documents/roles/admin).data.emails.has(request.auth.token.email);
     }
 
-    // Products can be read by anyone, but only managed by admins.
+    // Products: Everyone can read, only admins can write/delete
     match /products/{productId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write, delete: if isAdmin();
     }
 
-    // Offers can be read by anyone if active, but only managed by admins.
+    // Offers: Everyone can read, only admins can write/delete
     match /offers/{offerId} {
-      allow read: if resource.data.active == true || isAdmin();
-      allow write: if isAdmin();
+      allow read: if true;
+      allow write, delete: if isAdmin();
     }
 
-    // Orders can be created by authenticated users and read by admins.
+    // Orders: Users can create their own orders, but not view others'
     match /orders/{orderId} {
+      allow read, write: if request.auth != null && request.auth.uid == request.resource.data.userId;
       allow create: if request.auth != null;
-      allow read, write: if isAdmin();
     }
     
-    // Bulk orders can be created by authenticated users and read by admins.
-    match /bulk-orders/{bulkOrderId} {
-        allow create: if request.auth != null;
-        allow read, write: if isAdmin();
+    // Bulk Orders: Logged-in users can create, admins can read/delete
+    match /bulk-orders/{orderId} {
+      allow create: if request.auth != null;
+      allow read, delete: if isAdmin();
     }
 
-    // Admin role document can be read by authenticated users to check their status.
-    match /roles/admin {
-        allow get: if request.auth != null;
-        // writes should only be done from the Firebase console
-        allow write: if false; 
+    // Roles: Admins can manage roles.
+    // A special rule allows any authenticated user to create the initial 'admin' document.
+    match /roles/{role} {
+       allow read, write: if isAdmin();
+       // Allow creating the admin document if it does not exist yet.
+       // This is for the initial setup.
+       allow create: if role == 'admin' && request.auth != null && !exists(/databases/$(database)/documents/roles/admin);
     }
-
   }
 }
