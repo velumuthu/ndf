@@ -29,22 +29,23 @@ export default function AdminLayout({
   const pathname = usePathname();
   const { user, userDetails, loading, logout } = useAuth();
   const router = useRouter();
-  
-  // Don't apply layout for the login page
-  if (pathname === '/admin/login') {
-    return <>{children}</>;
-  }
 
   React.useEffect(() => {
-    if (!loading) {
+    // This effect should not run on the login page itself to avoid redirect loops.
+    if (pathname !== '/admin/login' && !loading) {
       if (!user) {
         router.push('/admin/login');
       } else if (userDetails && userDetails.role !== 'admin') {
         router.push('/'); // Redirect non-admins to home page
       }
     }
-  }, [user, userDetails, loading, router]);
+  }, [user, userDetails, loading, router, pathname]);
   
+  // Don't apply the protected layout for the login page
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
   if (loading || !user || !userDetails || userDetails.role !== 'admin') {
     return <div className="flex justify-center items-center h-screen"><p>Loading & Verifying Access...</p></div>
   }
