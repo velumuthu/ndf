@@ -92,9 +92,14 @@ export function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/login">Login</Link>
-                </Button>
+                <div className='hidden md:flex items-center space-x-2'>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href="/login">Login</Link>
+                  </Button>
+                  <Button asChild size="sm">
+                    <Link href="/signup">Sign Up</Link>
+                  </Button>
+                </div>
               )
            )}
 
