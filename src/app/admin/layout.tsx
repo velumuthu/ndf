@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Package, ShoppingBag, Tag, LayoutDashboard, MessageSquareHeart } from 'lucide-react';
+import { Package, ShoppingBag, Tag, LayoutDashboard, MessageSquareHeart, ClipboardList } from 'lucide-react';
 import { Shield } from 'lucide-react';
 
 const adminNavLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/products', label: 'Products', icon: Package },
+  { href: '/admin/orders', label: 'Orders', icon: ClipboardList },
   { href: '/admin/bulk-orders', label: 'Bulk Orders', icon: ShoppingBag },
   { href: '/admin/offers', label: 'Offers', icon: Tag },
   { href: '/admin/contact-stylist', label: 'Stylist Inquiries', icon: MessageSquareHeart },

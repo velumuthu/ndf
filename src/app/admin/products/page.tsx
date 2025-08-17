@@ -2,9 +2,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import type { Product } from '@/lib/types';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -298,7 +297,7 @@ export default function AdminProductsPage() {
                           <Image src={product.image} alt={product.name} width={60} height={80} className="rounded-md object-cover" />
                       </TableCell>
                       <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell>${product.price.toFixed(2)}</TableCell>
+                      <TableCell>₹{product.price.toFixed(2)}</TableCell>
                        <TableCell><Badge variant="secondary">{product.category}</Badge></TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">

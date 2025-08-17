@@ -26,6 +26,7 @@ export type Order = {
     state: string;
     zip: string;
   };
+  status: string;
   createdAt: any;
 }
 
@@ -58,5 +59,3 @@ export type StylistInquiry = {
     message: string;
     createdAt: any;
 }
-
-    

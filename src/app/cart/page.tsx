@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useCart } from '@/components/cart-provider';
@@ -97,12 +98,13 @@ export default function CartPage() {
         cart,
         totalPrice: finalPrice,
         shippingInfo,
+        status: 'Pending',
         createdAt: serverTimestamp(),
         userId: null, // User is anonymous
       });
       toast({
         title: 'Order Placed!',
-        description: 'Thank you for your purchase. A confirmation has been sent to your email.',
+        description: 'Your cash on delivery order has been confirmed. We will contact you shortly.',
       });
       clearCart();
       setShippingInfo({ name: '', address: '', city: '', state: '', zip: '' });
@@ -145,7 +147,7 @@ export default function CartPage() {
                 />
                 <div className="ml-4 flex-grow">
                   <h3 className="font-semibold">{item.product.name}</h3>
-                  <p className="text-sm text-muted-foreground">${item.product.price.toFixed(2)}</p>
+                  <p className="text-sm text-muted-foreground">₹{item.product.price.toFixed(2)}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>
@@ -172,11 +174,11 @@ export default function CartPage() {
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${totalPrice.toFixed(2)}</span>
+              <span>₹{totalPrice.toFixed(2)}</span>
             </div>
              <div className="flex justify-between text-destructive">
                 <span>Discount</span>
-                <span>-${(totalPrice - finalPrice).toFixed(2)}</span>
+                <span>-₹{(totalPrice - finalPrice).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>Shipping</span>
@@ -190,7 +192,7 @@ export default function CartPage() {
             <Separator />
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
-              <span>${finalPrice.toFixed(2)}</span>
+              <span>₹{finalPrice.toFixed(2)}</span>
             </div>
              <Separator />
              <div className="space-y-2">
@@ -207,18 +209,18 @@ export default function CartPage() {
           <CardFooter>
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <Button className="w-full" size="lg">Place Order</Button>
+                    <Button className="w-full" size="lg">Confirm Cash on Delivery Order</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                     <AlertDialogTitle>Confirm Your Order</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Please review your order details before confirming. Total: ${finalPrice.toFixed(2)}.
+                        You are placing a Cash on Delivery order. Total: ₹{finalPrice.toFixed(2)}.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handlePlaceOrder}>Confirm & Pay</AlertDialogAction>
+                    <AlertDialogAction onClick={handlePlaceOrder}>Confirm Order</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
