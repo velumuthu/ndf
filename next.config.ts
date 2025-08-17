@@ -1,4 +1,4 @@
-require('dotenv').config({ path: './.env.local' });
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https',
+        protocol: 'https' as const,
         hostname: 'ibb.co',
         port: '',
         pathname: '/**',
