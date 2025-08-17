@@ -9,6 +9,7 @@ import { useCart } from './cart-provider';
 import type { Product } from '@/lib/types';
 import { ShoppingCart, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Badge } from './ui/badge';
 
 interface ProductCardProps {
   product: Product;
@@ -25,8 +26,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Card className="flex flex-col overflow-hidden h-full group transition-all duration-300 border-0 bg-transparent shadow-none rounded-none">
-      <CardHeader className="p-0">
-        <Link href="#" className="block overflow-hidden rounded-lg">
+      <CardHeader className="p-0 relative">
+        <Link href={`/products/${product.id}`} className="block overflow-hidden rounded-lg">
           <Image
             src={product.image}
             alt={product.name}
@@ -36,10 +37,11 @@ export function ProductCard({ product }: ProductCardProps) {
             data-ai-hint={product.dataAiHint}
           />
         </Link>
+        {product.stock === 0 && <Badge variant="destructive" className="absolute top-3 right-3">Out of Stock</Badge>}
       </CardHeader>
       <CardContent className="p-4 flex-grow">
         <CardTitle className="text-lg font-semibold leading-snug">
-          <Link href="#" className="hover:text-primary transition-colors">
+          <Link href={`/products/${product.id}`} className="hover:text-primary transition-colors">
             {product.name}
           </Link>
         </CardTitle>
@@ -53,6 +55,7 @@ export function ProductCard({ product }: ProductCardProps) {
               onClick={() => addToCart(product)}
               variant="secondary"
               className="w-full font-bold"
+              disabled={product.stock === 0}
             >
               <ShoppingCart className="mr-2 h-4 w-4" />
               Add to Cart
@@ -61,6 +64,7 @@ export function ProductCard({ product }: ProductCardProps) {
               onClick={handleOrderNow}
               variant="default"
               className="w-full font-bold"
+              disabled={product.stock === 0}
             >
               <Zap className="mr-2 h-4 w-4" />
               Order Now

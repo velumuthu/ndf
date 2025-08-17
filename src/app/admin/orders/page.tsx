@@ -157,15 +157,17 @@ export default function AdminOrdersPage() {
                           <TableRow>
                             <TableHead>Image</TableHead>
                             <TableHead>Product</TableHead>
+                             <TableHead>Size</TableHead>
                             <TableHead>Quantity</TableHead>
                             <TableHead className="text-right">Price</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {order.cart.map(item => (
-                            <TableRow key={item.product.id}>
+                          {order.cart.map((item, index) => (
+                            <TableRow key={item.product.id + (item.size || index)}>
                                <TableCell><Image src={item.product.image} alt={item.product.name} width={40} height={50} className="rounded-md" /></TableCell>
                                <TableCell>{item.product.name}</TableCell>
+                               <TableCell>{item.size || 'N/A'}</TableCell>
                                <TableCell>x {item.quantity}</TableCell>
                                <TableCell className="text-right">₹{(item.product.price * item.quantity).toFixed(2)}</TableCell>
                             </TableRow>

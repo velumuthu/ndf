@@ -137,7 +137,7 @@ export default function CartPage() {
         ) : (
           <div className="space-y-4">
             {cart.map(item => (
-              <Card key={item.product.id} className="flex items-center p-4 bg-background">
+              <Card key={item.product.id + (item.size || '')} className="flex items-center p-4 bg-background">
                 <Image
                   src={item.product.image}
                   alt={item.product.name}
@@ -148,18 +148,19 @@ export default function CartPage() {
                 />
                 <div className="ml-4 flex-grow">
                   <h3 className="font-semibold">{item.product.name}</h3>
+                   {item.size && <p className="text-sm text-muted-foreground">Size: {item.size}</p>}
                   <p className="text-sm text-muted-foreground">₹{item.product.price.toFixed(2)}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>
+                  <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.size)}>
                     <Minus className="h-4 w-4" />
                   </Button>
                   <span className="w-10 text-center">{item.quantity}</span>
-                  <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>
+                  <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.size)}>
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-                <Button variant="ghost" size="icon" className="ml-4 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.product.id)}>
+                <Button variant="ghost" size="icon" className="ml-4 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.product.id, item.size)}>
                   <Trash2 className="h-5 w-5" />
                 </Button>
               </Card>

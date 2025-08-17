@@ -10,8 +10,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Dresses',
     trending: true,
-    description: 'A beautiful floral maxi dress, perfect for summer days.',
+    description: 'A beautiful floral maxi dress, perfect for summer days. Made from lightweight, breathable fabric, it features a flattering V-neck and a cinched waist.',
     dataAiHint: 'floral dress',
+    sizes: ['S', 'M', 'L', 'XL'],
+    stock: 15,
   },
   {
     id: '2',
@@ -20,8 +22,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Accessories',
     trending: false,
-    description: 'A timeless leather handbag that complements any outfit.',
+    description: 'A timeless leather handbag that complements any outfit. Features multiple compartments and a detachable shoulder strap.',
     dataAiHint: 'leather handbag',
+    sizes: ['One Size'],
+    stock: 20,
   },
   {
     id: '3',
@@ -30,8 +34,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Combos',
     trending: true,
-    description: 'A curated set for your next weekend adventure.',
+    description: 'A curated set for your next weekend adventure, including a comfortable top, versatile pants, and a stylish scarf.',
     dataAiHint: 'travel outfit',
+    sizes: ['S', 'M', 'L'],
+    stock: 8,
   },
   {
     id: '4',
@@ -40,8 +46,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Shirts',
     trending: true,
-    description: 'A breathable linen shirt with a classic striped pattern.',
+    description: 'A breathable linen shirt with a classic striped pattern. Perfect for a smart-casual look.',
     dataAiHint: 'linen shirt',
+    sizes: ['M', 'L', 'XL'],
+    stock: 12,
   },
   {
     id: '5',
@@ -50,8 +58,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Pants',
     trending: false,
-    description: 'Flattering high-waisted skinny jeans for a sleek silhouette.',
+    description: 'Flattering high-waisted skinny jeans for a sleek silhouette. Made with stretch denim for ultimate comfort.',
     dataAiHint: 'skinny jeans',
+    sizes: ['28', '30', '32', '34'],
+    stock: 25,
   },
   {
     id: '6',
@@ -60,8 +70,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Sportswear',
     trending: true,
-    description: 'Flexible and comfortable leggings for your yoga sessions.',
+    description: 'Flexible and comfortable leggings for your yoga sessions. Features a high-rise waistband and moisture-wicking fabric.',
     dataAiHint: 'yoga leggings',
+    sizes: ['S', 'M', 'L'],
+    stock: 0,
   },
   {
     id: '7',
@@ -70,8 +82,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Formals',
     trending: false,
-    description: 'A sharp, tailored blazer for professional settings.',
+    description: 'A sharp, tailored blazer for professional settings. Fully lined with a single-button closure.',
     dataAiHint: 'tailored blazer',
+    sizes: ['S', 'M', 'L', 'XL'],
+    stock: 10,
   },
   {
     id: '8',
@@ -80,8 +94,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Casuals',
     trending: true,
-    description: 'A versatile denim jacket for a relaxed, everyday look.',
+    description: 'A versatile denim jacket for a relaxed, everyday look. Features classic button-front styling and side pockets.',
     dataAiHint: 'denim jacket',
+    sizes: ['S', 'M', 'L'],
+    stock: 18,
   },
    {
     id: '9',
@@ -90,8 +106,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Dresses',
     trending: false,
-    description: 'An exquisite silk evening gown for special occasions.',
-    dataAiHint: 'evening gown'
+    description: 'An exquisite silk evening gown for special occasions. Features a floor-length design and intricate beadwork.',
+    dataAiHint: 'evening gown',
+    sizes: ['S', 'M', 'L'],
+    stock: 5,
   },
   {
     id: '10',
@@ -100,8 +118,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Casuals',
     trending: true,
-    description: 'A cozy and stylish chunky knit sweater for cooler days.',
-    dataAiHint: 'knit sweater'
+    description: 'A cozy and stylish chunky knit sweater for cooler days. Made from a soft wool blend.',
+    dataAiHint: 'knit sweater',
+    sizes: ['One Size'],
+    stock: 14,
   },
   {
     id: '11',
@@ -110,8 +130,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Sportswear',
     trending: false,
-    description: 'A lightweight and breathable tee for your workouts.',
-    dataAiHint: 'athletic tee'
+    description: 'A lightweight and breathable tee for your workouts, designed to keep you cool and dry.',
+    dataAiHint: 'athletic tee',
+    sizes: ['S', 'M', 'L', 'XL'],
+    stock: 30,
   },
   {
     id: '12',
@@ -120,8 +142,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Formals',
     trending: true,
-    description: 'A classic pleated A-line skirt for a touch of elegance.',
-    dataAiHint: 'pleated skirt'
+    description: 'A classic pleated A-line skirt for a touch of elegance. Falls just below the knee.',
+    dataAiHint: 'pleated skirt',
+    sizes: ['S', 'M', 'L'],
+    stock: 9,
   },
   {
     id: '13',
@@ -130,8 +154,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Branded',
     trending: true,
-    description: 'A stylish t-shirt featuring our exclusive brand logo.',
-    dataAiHint: 'logo t-shirt'
+    description: 'A stylish t-shirt featuring our exclusive brand logo. Made from 100% premium cotton.',
+    dataAiHint: 'logo t-shirt',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    stock: 50,
   },
   {
     id: '14',
@@ -140,8 +166,10 @@ const products = [
     image: 'https://placehold.co/600x800.png',
     category: 'Branded',
     trending: false,
-    description: 'High-performance shorts with subtle branding, perfect for workouts.',
-    dataAiHint: 'branded shorts'
+    description: 'High-performance shorts with subtle branding, perfect for workouts or casual wear.',
+    dataAiHint: 'branded shorts',
+    sizes: ['S', 'M', 'L'],
+    stock: 22,
   }
 ];
 

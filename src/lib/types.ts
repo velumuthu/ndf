@@ -8,11 +8,14 @@ export type Product = {
   trending: boolean;
   description: string;
   dataAiHint: string;
+  sizes: string[];
+  stock: number;
 };
 
 export type CartItem = {
   product: Product;
   quantity: number;
+  size?: string;
 };
 
 export type Order = {

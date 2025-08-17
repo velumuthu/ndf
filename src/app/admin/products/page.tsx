@@ -2,8 +2,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { db } from '@/lib/firebase';
+import { db, storage } from '@/lib/firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import type { Product } from '@/lib/types';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -36,6 +37,7 @@ export default function AdminProductsPage() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrlInput, setImageUrlInput] = useState('');
 
@@ -63,9 +65,23 @@ export default function AdminProductsPage() {
     fetchProducts();
   }, [fetchProducts]);
 
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setImageUrlInput(''); // Clear URL input if file is selected
+    }
+  }
+
   const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImageUrlInput(e.target.value);
     setImagePreview(e.target.value);
+    setImageFile(null); // Clear file input if URL is entered
   }
 
   const handleTrendingToggle = async (productId: string, currentStatus: boolean) => {
@@ -115,6 +131,7 @@ export default function AdminProductsPage() {
 
   const handleOpenDialog = (product: Product | null = null) => {
     setEditingProduct(product);
+    setImageFile(null);
     setImagePreview(product?.image || null);
     setImageUrlInput(product?.image || '');
     setIsDialogOpen(true);
@@ -123,6 +140,7 @@ export default function AdminProductsPage() {
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setEditingProduct(null);
+    setImageFile(null);
     setImagePreview(null);
     setImageUrlInput('');
   }
@@ -131,13 +149,21 @@ export default function AdminProductsPage() {
       e.preventDefault();
       setIsSubmitting(true);
       const formData = new FormData(e.currentTarget);
-      const productData = Object.fromEntries(formData.entries()) as Omit<Product, 'id' | 'trending' | 'image' | 'price' | 'imageUrl'> & { price: string, imageUrl: string };
+      const productData = Object.fromEntries(formData.entries()) as Omit<Product, 'id' | 'trending' | 'image' | 'price' | 'stock' | 'sizes'> & { price: string, stock: string, sizes: string };
 
-      const finalImageUrl = productData.imageUrl || editingProduct?.image || '';
+      let finalImageUrl = editingProduct?.image || '';
 
       try {
+        if (imageFile) {
+          const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
+          const uploadResult = await uploadBytes(storageRef, imageFile);
+          finalImageUrl = await getDownloadURL(uploadResult.ref);
+        } else if (imageUrlInput) {
+            finalImageUrl = imageUrlInput;
+        }
+
         if (!finalImageUrl) {
-            toast({ title: "Error", description: "An image URL is required.", variant: "destructive"});
+            toast({ title: "Error", description: "An image is required. Please upload a file or provide a URL.", variant: "destructive"});
             setIsSubmitting(false);
             return;
         }
@@ -146,6 +172,8 @@ export default function AdminProductsPage() {
             name: productData.name,
             description: productData.description,
             price: parseFloat(productData.price),
+            stock: parseInt(productData.stock, 10),
+            sizes: productData.sizes.split(',').map(s => s.trim()).filter(Boolean),
             category: productData.category,
             dataAiHint: productData.dataAiHint,
             trending: editingProduct ? editingProduct.trending : false,
@@ -223,6 +251,14 @@ export default function AdminProductsPage() {
                         <Label htmlFor="price" className="text-right">Price</Label>
                         <Input id="price" name="price" type="number" step="0.01" defaultValue={editingProduct?.price} className="col-span-3" required/>
                     </div>
+                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="stock" className="text-right">Stock</Label>
+                        <Input id="stock" name="stock" type="number" step="1" defaultValue={editingProduct?.stock ?? 0} className="col-span-3" required/>
+                    </div>
+                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="sizes" className="text-right">Sizes</Label>
+                        <Input id="sizes" name="sizes" placeholder="S, M, L, XL" defaultValue={editingProduct?.sizes?.join(', ')} className="col-span-3" required/>
+                    </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="category" className="text-right">Category</Label>
                          <Select name="category" defaultValue={editingProduct?.category} required>
@@ -235,9 +271,18 @@ export default function AdminProductsPage() {
                         </Select>
                     </div>
                     <div className="grid grid-cols-4 items-start gap-4">
-                        <Label htmlFor="imageUrl" className="text-right pt-2">Image URL</Label>
+                        <Label htmlFor="imageFile" className="text-right pt-2">Image</Label>
                         <div className="col-span-3 space-y-2">
                            <Input 
+                                id="imageFile" 
+                                name="imageFile" 
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageFileChange} 
+                                className="col-span-3"
+                            />
+                             <div className="text-center text-xs text-muted-foreground my-2">OR</div>
+                            <Input 
                                 id="imageUrl" 
                                 name="imageUrl" 
                                 type="text" 
@@ -245,7 +290,6 @@ export default function AdminProductsPage() {
                                 value={imageUrlInput}
                                 onChange={handleImageUrlChange} 
                                 className="col-span-3"
-                                required
                             />
                             {imagePreview && (
                                 <Image
@@ -253,7 +297,7 @@ export default function AdminProductsPage() {
                                 alt="Product image preview"
                                 width={100}
                                 height={100}
-                                className="rounded-md object-cover"
+                                className="rounded-md object-cover mt-2"
                                 />
                             )}
                         </div>
@@ -285,6 +329,7 @@ export default function AdminProductsPage() {
                     <TableHead>Image</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Price</TableHead>
+                    <TableHead>Stock</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Trending</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -298,6 +343,7 @@ export default function AdminProductsPage() {
                       </TableCell>
                       <TableCell className="font-medium">{product.name}</TableCell>
                       <TableCell>₹{product.price.toFixed(2)}</TableCell>
+                      <TableCell>{product.stock > 0 ? product.stock : <Badge variant="destructive">Out</Badge>}</TableCell>
                        <TableCell><Badge variant="secondary">{product.category}</Badge></TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
