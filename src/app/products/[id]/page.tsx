@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, limit, documentId } from 'firebase/firestore';
 import type { Product } from '@/lib/types';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -45,7 +45,7 @@ export default function ProductDetailPage() {
           const q = query(
             collection(db, "products"),
             where("category", "==", productData.category),
-            where("id", "!=", id),
+            where(documentId(), "!=", id),
             limit(4)
           );
           const querySnapshot = await getDocs(q);
