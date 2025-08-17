@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -32,7 +31,11 @@ export function Footer() {
         </div>
         <div className="border-t mt-8 pt-6 text-center text-sm text-muted-foreground">
            <p>&copy; {new Date().getFullYear()} Namma Dream Fashion. All rights reserved.</p>
-           <p className="mt-2">Designed and Developed by btechnologies</p>
+           <p className="mt-2">
+             <a href="https://wa.me/91865172090" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                Designed and Developed by B Technologies
+             </a>
+            </p>
         </div>
       </div>
     </footer>
