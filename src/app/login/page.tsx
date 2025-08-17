@@ -15,6 +15,8 @@ import { useState } from "react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -24,16 +26,34 @@ export default function LoginPage() {
     const router = useRouter();
     const { toast } = useToast();
 
+    const isAdminCheck = async (user: any) => {
+        const adminDocRef = doc(db, 'roles', 'admin');
+        const adminDoc = await getDoc(adminDocRef);
+        if (adminDoc.exists()) {
+            const adminData = adminDoc.data();
+            const adminEmails = adminData.emails || [];
+            return adminEmails.includes(user.email!);
+        }
+        return false;
+    }
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const userIsAdmin = await isAdminCheck(userCredential.user);
+            
             toast({
                 title: "Login Successful",
                 description: "Welcome back!",
             });
-            router.push('/');
+
+            if (userIsAdmin) {
+                 router.push('/admin');
+            } else {
+                router.push('/');
+            }
         } catch (err: any) {
             setError(err.message);
             toast({

@@ -14,7 +14,8 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
-import { useAdmin } from "@/hooks/use-admin";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function AdminLoginPage() {
     const [email, setEmail] = useState('');
@@ -23,24 +24,45 @@ export default function AdminLoginPage() {
     const auth = getAuth();
     const router = useRouter();
     const { toast } = useToast();
-    const { isAdmin, loading } = useAdmin();
+    
+    const isAdminCheck = async (user: any) => {
+        const adminDocRef = doc(db, 'roles', 'admin');
+        const adminDoc = await getDoc(adminDocRef);
+        if (adminDoc.exists()) {
+            const adminData = adminDoc.data();
+            const adminEmails = adminData.emails || [];
+            return adminEmails.includes(user.email!);
+        }
+        return false;
+    }
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            router.push('/admin');
-            toast({
-                title: "Admin Login Successful",
-                description: "Welcome to the dashboard!",
-            });
+            const userIsAdmin = await isAdminCheck(userCredential.user);
+            
+            if (userIsAdmin) {
+                 toast({
+                    title: "Admin Login Successful",
+                    description: "Welcome to the dashboard!",
+                });
+                router.push('/admin');
+            } else {
+                 toast({
+                    title: "Login Failed",
+                    description: "You do not have admin privileges.",
+                    variant: "destructive",
+                });
+                await auth.signOut(); // Sign out the non-admin user
+            }
 
         } catch (err: any) {
             setError(err.message);
             toast({
                 title: "Login Failed",
-                description: "Please check your credentials or admin privileges.",
+                description: "Please check your credentials.",
                 variant: "destructive",
             });
         }
