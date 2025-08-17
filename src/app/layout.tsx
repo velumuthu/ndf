@@ -1,11 +1,11 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
 import { CartProvider } from '@/components/cart-provider';
-import { NotificationBanner } from '@/components/notification-banner';
 import { AuthProvider } from '@/components/auth-provider';
+import { AdminLayoutContent } from '@/components/admin-layout-content';
+
 
 export const metadata: Metadata = {
   title: 'Namma Dream Fashion',
@@ -27,14 +27,9 @@ export default function RootLayout({
       <body className="font-body bg-background text-foreground antialiased h-full">
         <AuthProvider>
           <CartProvider>
-            <div className="flex flex-col min-h-screen">
-              <NotificationBanner />
-              <Header />
-              <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {children}
-              </main>
-              <Footer />
-            </div>
+            <AdminLayoutContent>
+              {children}
+            </AdminLayoutContent>
             <Toaster />
           </CartProvider>
         </AuthProvider>

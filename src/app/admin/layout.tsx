@@ -29,11 +29,16 @@ export default function AdminLayout({
   const pathname = usePathname();
   const { user, userDetails, loading, logout } = useAuth();
   const router = useRouter();
+  
+  // Don't apply layout for the login page
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
 
   React.useEffect(() => {
     if (!loading) {
       if (!user) {
-        router.push('/login?redirect=/admin');
+        router.push('/admin/login');
       } else if (userDetails && userDetails.role !== 'admin') {
         router.push('/'); // Redirect non-admins to home page
       }
@@ -45,7 +50,7 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="grid md:grid-cols-[240px_1fr] gap-10">
+    <div className="grid md:grid-cols-[240px_1fr] gap-10 p-4">
       <aside>
         <nav className="flex flex-col space-y-2">
            <Link href="/" className="text-xl font-headline font-bold text-foreground hover:text-primary transition-colors mb-6 flex items-center gap-2">
