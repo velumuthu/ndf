@@ -38,7 +38,7 @@ export default function SignupPage() {
         uid: user.uid,
         email: user.email,
         displayName: name,
-        role: 'customer', // Default role
+        role: email === 'ndf@squad.com' ? 'admin' : 'customer', // Assign role based on email
       });
 
       router.push('/profile');
