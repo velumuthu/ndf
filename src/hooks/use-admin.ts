@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/auth-provider';
 
@@ -27,12 +27,13 @@ export function useAdmin() {
         if (adminDoc.exists()) {
           const adminData = adminDoc.data();
           const adminEmails = adminData.emails || [];
-          setIsAdmin(adminEmails.includes(user.email));
+          setIsAdmin(adminEmails.includes(user.email!));
         } else {
             // To bootstrap, let's create a default admin role if it doesn't exist
-            // In a real app, this should be handled securely.
-            console.log("No admin role found. You can set one up in Firestore under roles/admin");
-            setIsAdmin(false);
+            console.log("No admin role found. Creating a default admin role with 'admin@example.com'.");
+            await setDoc(adminDocRef, { emails: ['admin@example.com'] });
+            // Check if the current user is the default admin
+            setIsAdmin(user.email === 'admin@example.com');
         }
       } catch (error) {
         console.error('Error checking admin status:', error);
