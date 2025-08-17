@@ -1,8 +1,10 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { db } from '@/lib/firebase';
+import { db, storage } from '@/lib/firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import type { Product } from '@/lib/types';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -13,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Trash2, Edit } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -21,7 +23,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,9 +33,12 @@ const productCategories: Product['category'][] = ['Dresses', 'Accessories', 'Com
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -58,6 +62,21 @@ export default function AdminProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImageFile(null);
+      setImagePreview(null);
+    }
+  };
 
   const handleTrendingToggle = async (productId: string, currentStatus: boolean) => {
     const productRef = doc(db, 'products', productId);
@@ -106,26 +125,46 @@ export default function AdminProductsPage() {
 
   const handleOpenDialog = (product: Product | null = null) => {
     setEditingProduct(product);
+    setImageFile(null);
+    setImagePreview(product?.image || null);
     setIsDialogOpen(true);
   }
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setEditingProduct(null);
+    setImageFile(null);
+    setImagePreview(null);
   }
 
   const handleProductFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      setIsSubmitting(true);
       const formData = new FormData(e.currentTarget);
-      const productData = Object.fromEntries(formData.entries()) as Omit<Product, 'id' | 'trending'> & { price: string };
+      const productData = Object.fromEntries(formData.entries()) as Omit<Product, 'id' | 'trending' | 'image'> & { price: string };
 
-      const dataToSave = {
-          ...productData,
-          price: parseFloat(productData.price),
-          trending: editingProduct ? editingProduct.trending : false,
-      };
+      let imageUrl = editingProduct?.image || '';
 
       try {
+        if (imageFile) {
+          const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
+          const uploadResult = await uploadBytes(storageRef, imageFile);
+          imageUrl = await getDownloadURL(uploadResult.ref);
+        }
+
+        if (!imageUrl) {
+            toast({ title: "Error", description: "An image is required.", variant: "destructive"});
+            setIsSubmitting(false);
+            return;
+        }
+
+        const dataToSave = {
+            ...productData,
+            price: parseFloat(productData.price),
+            trending: editingProduct ? editingProduct.trending : false,
+            image: imageUrl,
+        };
+
           if (editingProduct) {
               const productRef = doc(db, 'products', editingProduct.id);
               await updateDoc(productRef, dataToSave);
@@ -139,6 +178,8 @@ export default function AdminProductsPage() {
       } catch (error) {
           console.error("Error saving product: ", error);
           toast({ title: "Error", description: "Could not save product.", variant: "destructive" });
+      } finally {
+        setIsSubmitting(false);
       }
   }
   
@@ -206,17 +247,31 @@ export default function AdminProductsPage() {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="image" className="text-right">Image URL</Label>
-                        <Input id="image" name="image" defaultValue={editingProduct?.image} className="col-span-3" required />
+                    <div className="grid grid-cols-4 items-start gap-4">
+                        <Label htmlFor="image" className="text-right pt-2">Image</Label>
+                        <div className="col-span-3 space-y-2">
+                           <Input id="image" name="image" type="file" accept="image/*" onChange={handleImageChange} />
+                            {imagePreview && (
+                                <Image
+                                src={imagePreview}
+                                alt="Product image preview"
+                                width={100}
+                                height={100}
+                                className="rounded-md object-cover"
+                                />
+                            )}
+                        </div>
                     </div>
                      <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="dataAiHint" className="text-right">AI Hint</Label>
                         <Input id="dataAiHint" name="dataAiHint" defaultValue={editingProduct?.dataAiHint} className="col-span-3" required/>
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="outline" onClick={handleDialogClose}>Cancel</Button>
-                        <Button type="submit">Save Product</Button>
+                        <Button type="button" variant="outline" onClick={handleDialogClose} disabled={isSubmitting}>Cancel</Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Save Product
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
@@ -275,3 +330,5 @@ export default function AdminProductsPage() {
     </div>
   );
 }
+
+    

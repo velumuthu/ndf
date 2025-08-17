@@ -1,3 +1,4 @@
+
 export type Product = {
   id: string;
   name: string;
@@ -57,3 +58,5 @@ export type StylistInquiry = {
     message: string;
     createdAt: any;
 }
+
+    
