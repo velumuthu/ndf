@@ -2,21 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingCart, LogOut, User, Shield } from 'lucide-react';
+import { ShoppingCart, User, Shield } from 'lucide-react';
 import { useCart } from './cart-provider';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { MobileNav } from './mobile-nav';
 import { useAuth } from './auth-provider';
-import { Button } from './ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -27,11 +18,11 @@ const navLinks = [
 
 export function Header() {
   const { cart } = useCart();
-  const { user, logOut } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  const adminLinks = user ? [{ href: '/admin/products', label: 'Admin' }] : [];
+  const adminLinks = user ? [{ href: '/admin', label: 'Admin' }] : [];
   const allNavLinks = [...navLinks, ...adminLinks];
 
   return (
@@ -53,6 +44,12 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+           {user && (
+             <Link href="/admin" className={cn(
+                'text-base font-medium transition-colors hover:text-primary',
+                pathname.startsWith('/admin') ? 'text-primary' : 'text-muted-foreground'
+              )}>Admin</Link>
+           )}
         </nav>
         <div className="flex items-center space-x-4">
           <Link href="/cart" className="relative group">
@@ -63,41 +60,6 @@ export function Header() {
               </span>
             )}
           </Link>
-
-          {user ? (
-             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <User className="h-6 w-6" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">My Account</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                 <DropdownMenuItem asChild>
-                   <Link href="/admin/products">
-                      <Shield className="mr-2 h-4 w-4" />
-                      <span>Admin</span>
-                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={logOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-             <Button asChild>
-                <Link href="/login">Login</Link>
-            </Button>
-          )}
 
           <div className="md:hidden">
             <MobileNav navLinks={allNavLinks} />

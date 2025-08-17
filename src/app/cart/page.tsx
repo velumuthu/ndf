@@ -8,11 +8,10 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Minus, Plus, Trash2, ShoppingCart, Info } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { addDoc, collection, doc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { useAuth } from '@/components/auth-provider';
 import type { Offer } from '@/lib/types';
 import {
   AlertDialog,
@@ -28,7 +27,6 @@ import {
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
-  const { user } = useAuth();
   const { toast } = useToast();
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
@@ -100,7 +98,7 @@ export default function CartPage() {
         totalPrice: finalPrice,
         shippingInfo,
         createdAt: serverTimestamp(),
-        userId: user?.uid,
+        userId: null, // User is anonymous
       });
       toast({
         title: 'Order Placed!',
@@ -119,19 +117,6 @@ export default function CartPage() {
       });
     }
   };
-  
-  if (!user) {
-    return (
-      <div className="text-center py-16 bg-card rounded-lg">
-          <Info className="mx-auto h-16 w-16 text-primary" />
-          <h2 className="mt-4 text-2xl font-semibold">Please Log In</h2>
-          <p className="mt-2 text-muted-foreground">You need to be logged in to view your cart and place orders.</p>
-          <Button asChild className="mt-6">
-            <Link href="/login">Login or Sign Up</Link>
-          </Button>
-      </div>
-    )
-  }
 
   return (
     <div className="grid md:grid-cols-3 gap-12">
