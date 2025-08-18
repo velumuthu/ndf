@@ -16,6 +16,19 @@ import { ShoppingCart, Zap, ArrowLeft } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 
+// Fisher-Yates shuffle algorithm
+const shuffleArray = (array: any[]) => {
+  let currentIndex = array.length, randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
+
+
 export default function ProductDetailPage() {
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
@@ -45,12 +58,14 @@ export default function ProductDetailPage() {
           const q = query(
             collection(db, "products"),
             where("category", "==", productData.category),
-            where(documentId(), "!=", id),
-            limit(4)
+            where(documentId(), "!=", id)
           );
           const querySnapshot = await getDocs(q);
-          const recs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
-          setRecommendedProducts(recs);
+          const allRecs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+          
+          // Shuffle and take the first 8
+          const shuffledRecs = shuffleArray(allRecs).slice(0, 8);
+          setRecommendedProducts(shuffledRecs);
 
         } else {
           console.log('No such document!');
