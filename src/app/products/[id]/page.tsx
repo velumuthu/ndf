@@ -63,8 +63,8 @@ export default function ProductDetailPage() {
           const querySnapshot = await getDocs(q);
           const allRecs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
           
-          // Shuffle and take the first 8
-          const shuffledRecs = shuffleArray(allRecs).slice(0, 8);
+          // Shuffle and take the first 12
+          const shuffledRecs = shuffleArray(allRecs).slice(0, 12);
           setRecommendedProducts(shuffledRecs);
 
         } else {
