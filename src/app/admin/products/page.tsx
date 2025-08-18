@@ -295,15 +295,15 @@ export default function AdminProductsPage() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="sm:max-w-[525px] grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
+            <DialogContent className="sm:max-w-[525px]">
                 <DialogHeader>
                     <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
                     <DialogDescription>
                         {editingProduct ? 'Update the details of the existing product.' : 'Fill in the details for the new product.'}
                     </DialogDescription>
                 </DialogHeader>
-                <div className="overflow-y-auto pr-6">
-                  <form id="product-form" onSubmit={handleProductFormSubmit} className="grid gap-4 py-4">
+                <div className="overflow-y-auto max-h-[70vh] p-1">
+                  <form id="product-form" onSubmit={handleProductFormSubmit} className="grid gap-4 py-4 pr-4">
                       <div className="grid grid-cols-4 items-center gap-4">
                           <Label htmlFor="name" className="text-right">Name</Label>
                           <Input id="name" name="name" defaultValue={editingProduct?.name} className="col-span-3" required />
