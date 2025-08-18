@@ -13,13 +13,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'placehold.c',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https' as const,
-        hostname: 'ibb.co',
+        hostname: 'i.ibb.co',
         port: '',
         pathname: '/**',
       }

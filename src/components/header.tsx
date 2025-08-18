@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Image from 'next/image';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -47,7 +48,8 @@ export function Header() {
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-40 border-b">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div onClick={handleLogoClick} className="cursor-pointer">
-           <Link href="/" className="text-xl font-headline font-bold text-foreground hover:text-primary transition-colors">
+           <Link href="/" className="flex items-center gap-2 text-xl font-headline font-bold text-foreground hover:text-primary transition-colors">
+              <Image src="https://i.ibb.co/3kC6r7j/NDF-Logo.png" alt="Namma Dream Fashion Logo" width={40} height={40} />
               Namma Dream Fashion
            </Link>
         </div>
@@ -124,5 +126,3 @@ export function Header() {
     </header>
   );
 }
-
-    
