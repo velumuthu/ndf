@@ -49,7 +49,6 @@ export function Header() {
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div onClick={handleLogoClick} className="cursor-pointer">
            <Link href="/" className="flex items-center gap-2 text-xl font-headline font-bold text-foreground hover:text-primary transition-colors">
-              <Image src="https://i.ibb.co/3kC6r7j/NDF-Logo.png" alt="Namma Dream Fashion Logo" width={40} height={40} />
               Namma Dream Fashion
            </Link>
         </div>
